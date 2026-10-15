@@ -11,14 +11,14 @@
             "id": "ffb99158b5aefb7a",
             "type": "leaf",
             "state": {
-              "type": "markdown",
+              "type": "split-diff-view",
               "state": {
-                "file": "Projects/Modulo-WhatsApp.md",
-                "mode": "source",
-                "source": false
+                "aFile": ".claudian/claudian-settings.json",
+                "bFile": ".claudian/claudian-settings.json",
+                "aRef": ""
               },
-              "icon": "lucide-file",
-              "title": "Modulo-WhatsApp"
+              "icon": "diff",
+              "title": "Diff: claudian-settings.json  (Working Tree)"
             }
           }
         ]
@@ -99,7 +99,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "Projects/Modulo-WhatsApp.md",
+                "file": "Contexto-para-Claude.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -118,7 +118,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "Projects/Modulo-WhatsApp.md",
+                "file": "Contexto-para-Claude.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               },
@@ -161,7 +161,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "Projects/Modulo-WhatsApp.md",
+                "file": "Contexto-para-Claude.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
@@ -169,13 +169,44 @@
               "icon": "lucide-list",
               "title": "Esquema"
             }
+          },
+          {
+            "id": "05501a2b90056692",
+            "type": "leaf",
+            "state": {
+              "type": "claudian-view",
+              "state": {
+                "tabWorkspace": {
+                  "version": 1,
+                  "openTabs": [
+                    {
+                      "tabId": "tab-1792088874724-6dywqkr",
+                      "conversationId": "conv-1792089079706-r4mpzpk2k"
+                    }
+                  ],
+                  "activeTabId": "tab-1792088874724-6dywqkr"
+                }
+              },
+              "icon": "bot",
+              "title": "Claudian"
+            }
+          },
+          {
+            "id": "79d040eb881bfd97",
+            "type": "leaf",
+            "state": {
+              "type": "git-view",
+              "state": {},
+              "icon": "git-pull-request",
+              "title": "Source Control"
+            }
           }
-        ]
+        ],
+        "currentTab": 6
       }
     ],
     "direction": "horizontal",
-    "width": 300,
-    "collapsed": true
+    "width": 514.5
   },
   "left-ribbon": {
     "hiddenItems": {
@@ -192,6 +223,8 @@
   },
   "active": "ffb99158b5aefb7a",
   "lastOpenFiles": [
+    "Contexto-para-Claude.md",
+    "Projects/Modulo-WhatsApp.md",
     "README.md",
     "skills-lock.json",
     "Projects/Consultas-SQL-Tickets.md.tmp.23024.ae67d49f5fa7",
@@ -215,7 +248,6 @@
     "Journal/2026-10-15.md.tmp.23024.288516d50549",
     "People/Alejo.md",
     "People/Checho.md",
-    "Projects/Modulo-WhatsApp.md",
     "Projects/Checklist-Usuarios-GLPI.md",
     "Projects/Portal-de-Cliente.md",
     "Templates/Plantilla-Pitch.md",
