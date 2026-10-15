@@ -20,8 +20,26 @@
               "icon": "lucide-file",
               "title": "Modulo-WhatsApp"
             }
+          },
+          {
+            "id": "f1334a0e28074db8",
+            "type": "leaf",
+            "state": {
+              "type": "canvas",
+              "state": {
+                "file": "Projects/Integracion-Mapfre-LAIA-n8n.canvas",
+                "viewState": {
+                  "x": 601.44730884663,
+                  "y": 175.70089709788252,
+                  "zoom": -0.9653918138910309
+                }
+              },
+              "icon": "lucide-layout-dashboard",
+              "title": "Integracion-Mapfre-LAIA-n8n"
+            }
           }
-        ]
+        ],
+        "currentTab": 1
       }
     ],
     "direction": "vertical"
@@ -169,13 +187,34 @@
               "icon": "lucide-list",
               "title": "Esquema"
             }
+          },
+          {
+            "id": "e1b24925b4a0d7b9",
+            "type": "leaf",
+            "state": {
+              "type": "claudian-view",
+              "state": {
+                "tabWorkspace": {
+                  "version": 1,
+                  "openTabs": [
+                    {
+                      "tabId": "tab-1792089618824-68m17au",
+                      "conversationId": "conv-1792089715475-us60virbe"
+                    }
+                  ],
+                  "activeTabId": "tab-1792089618824-68m17au"
+                }
+              },
+              "icon": "bot",
+              "title": "Claudian"
+            }
           }
-        ]
+        ],
+        "currentTab": 5
       }
     ],
     "direction": "horizontal",
-    "width": 300,
-    "collapsed": true
+    "width": 554.5
   },
   "left-ribbon": {
     "hiddenItems": {
@@ -190,8 +229,10 @@
       "realclaudian:Open Claudian": false
     }
   },
-  "active": "ffb99158b5aefb7a",
+  "active": "f1334a0e28074db8",
   "lastOpenFiles": [
+    "Projects/Modulo-WhatsApp.md",
+    "Projects/Integracion-Mapfre-LAIA-n8n.canvas",
     "README.md",
     "skills-lock.json",
     "Projects/Consultas-SQL-Tickets.md.tmp.23024.ae67d49f5fa7",
@@ -215,7 +256,6 @@
     "Journal/2026-10-15.md.tmp.23024.288516d50549",
     "People/Alejo.md",
     "People/Checho.md",
-    "Projects/Modulo-WhatsApp.md",
     "Projects/Checklist-Usuarios-GLPI.md",
     "Projects/Portal-de-Cliente.md",
     "Templates/Plantilla-Pitch.md",
