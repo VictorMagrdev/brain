@@ -16,4 +16,7 @@
 ## Tip
 Si publicaron el front y no ves los cambios aunque borres caché, prueba **otro navegador** antes de escalar.
 
+## Referencia relacionada
+Para automatizar WhatsApp con WAHA, n8n y webhooks ver la [wiki](../Wiki/Wiki-WhatsApp-Automatizacion.md). No es parte de este módulo.
+
 Volver a [Home](../Home.md)

@@ -4,39 +4,17 @@
     "type": "split",
     "children": [
       {
-        "id": "0075012ef4381ee9",
+        "id": "30195c0a051088b9",
         "type": "tabs",
         "children": [
           {
-            "id": "ffb99158b5aefb7a",
+            "id": "3403b813306ced78",
             "type": "leaf",
             "state": {
-              "type": "split-diff-view",
-              "state": {
-                "aFile": ".gitignore",
-                "bFile": ".gitignore",
-                "aRef": "HEAD",
-                "bRef": ""
-              },
-              "icon": "diff",
-              "title": "Diff: .gitignore  (Index)"
-            }
-          },
-          {
-            "id": "f1334a0e28074db8",
-            "type": "leaf",
-            "state": {
-              "type": "canvas",
-              "state": {
-                "file": "Projects/Integracion-Mapfre-LAIA-n8n.canvas",
-                "viewState": {
-                  "x": 601.44730884663,
-                  "y": 175.70089709788252,
-                  "zoom": -0.9653918138910309
-                }
-              },
-              "icon": "lucide-layout-dashboard",
-              "title": "Integracion-Mapfre-LAIA-n8n"
+              "type": "empty",
+              "state": {},
+              "icon": "lucide-file",
+              "title": "Nueva pestaña"
             }
           }
         ]
@@ -229,7 +207,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 1154.5
+    "width": 602.5
   },
   "left-ribbon": {
     "hiddenItems": {
@@ -246,6 +224,16 @@
   },
   "active": "6eff36a7ea53b8c2",
   "lastOpenFiles": [
+    "Wiki/Wiki-WhatsApp-Automatizacion.md",
+    "Wiki/Webhooks-Conceptos.md",
+    "Wiki/WAHA.md",
+    "Wiki/WAHA-Webhooks.md",
+    "Wiki/WAHA-Seguridad-y-Antibloqueo.md",
+    "Wiki/WAHA-con-n8n.md",
+    "Wiki/n8n-Webhook.md",
+    "Wiki/Migracion-Evolution-a-WAHA.md",
+    "Wiki/Evolution-API.md",
+    "Wiki",
     "Projects/Modulo-WhatsApp.md",
     "Contexto-para-Claude.md",
     "Projects/Integracion-Mapfre-LAIA-n8n.canvas",
@@ -269,19 +257,9 @@
     "Projects/Modulo-WhatsApp.md.tmp.23024.764210068512",
     "Projects/Incidencia-uContact.md.tmp.23024.6aec2cda068a",
     "Journal/2026-10-15.md.tmp.23024.5ab29b7f11e4",
-    "Journal/2026-10-15.md.tmp.23024.288516d50549",
     "People/Alejo.md",
     "People/Checho.md",
     "Projects/Checklist-Usuarios-GLPI.md",
-    "Projects/Portal-de-Cliente.md",
-    "Templates/Plantilla-Pitch.md",
-    "Pitches/Pitches.md",
-    "People/Laura-Mendez.md",
-    "People/Diego-Herrera.md",
-    "People/Camila-Rojas.md",
-    "Journal/2026-10-15.md",
-    "Ideas/Inbox.md",
-    "Bienvenido.md",
-    "Home.md"
+    "Projects/Portal-de-Cliente.md"
   ]
 }
