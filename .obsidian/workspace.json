@@ -200,9 +200,14 @@
                     {
                       "tabId": "tab-1792089618824-68m17au",
                       "conversationId": "conv-1792089715475-us60virbe"
+                    },
+                    {
+                      "tabId": "tab-1792428220888-hjfm4rw",
+                      "conversationId": "conv-1792089715475-us60virbe",
+                      "preview": true
                     }
                   ],
-                  "activeTabId": "tab-1792089618824-68m17au"
+                  "activeTabId": "tab-1792428220888-hjfm4rw"
                 }
               },
               "icon": "bot",
@@ -224,7 +229,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 554.5
+    "width": 1154.5
   },
   "left-ribbon": {
     "hiddenItems": {
