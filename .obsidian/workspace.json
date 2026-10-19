@@ -11,14 +11,15 @@
             "id": "ffb99158b5aefb7a",
             "type": "leaf",
             "state": {
-              "type": "markdown",
+              "type": "split-diff-view",
               "state": {
-                "file": "Projects/Modulo-WhatsApp.md",
-                "mode": "source",
-                "source": false
+                "aFile": ".gitignore",
+                "bFile": ".gitignore",
+                "aRef": "HEAD",
+                "bRef": ""
               },
-              "icon": "lucide-file",
-              "title": "Modulo-WhatsApp"
+              "icon": "diff",
+              "title": "Diff: .gitignore  (Index)"
             }
           },
           {
@@ -240,8 +241,9 @@
   },
   "active": "ffb99158b5aefb7a",
   "lastOpenFiles": [
-    "Projects/Integracion-Mapfre-LAIA-n8n.canvas",
     "Projects/Modulo-WhatsApp.md",
+    "Contexto-para-Claude.md",
+    "Projects/Integracion-Mapfre-LAIA-n8n.canvas",
     "README.md",
     "skills-lock.json",
     "Projects/Consultas-SQL-Tickets.md.tmp.23024.ae67d49f5fa7",
