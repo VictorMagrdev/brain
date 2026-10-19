@@ -1,224 +1,30 @@
 {
-  "nodes": [
-    {
-      "id": "a1b2c3d4e5f60001",
-      "type": "text",
-      "x": 0,
-      "y": -260,
-      "width": 900,
-      "height": 200,
-      "text": "# Integración MAPFRE → LAIA vía n8n\n\nMigración del webhook actual (Cloudflare Worker) a un flujo intermedio con **n8n**, porque la API actual que recibe los leads **no es de ICC**.\n\nVer también: [Módulo WhatsApp](Modulo-WhatsApp.md) (otro caso de integración vía webhook)."
-    },
-    {
-      "id": "a1b2c3d4e5f6000f",
-      "type": "link",
-      "x": 950,
-      "y": -260,
-      "width": 350,
-      "height": 140,
-      "url": "https://www.mapfreseguros.com.co/"
-    },
-    {
-      "id": "a1b2c3d4e5f60002",
-      "type": "group",
-      "x": 0,
-      "y": 0,
-      "width": 1400,
-      "height": 400,
-      "label": "Flujo ACTUAL",
-      "color": "1"
-    },
-    {
-      "id": "a1b2c3d4e5f60003",
-      "type": "text",
-      "x": 40,
-      "y": 140,
-      "width": 320,
-      "height": 220,
-      "text": "## Landing MAPFRE\nFormulario WordPress con campos:\n- name\n- documento\n- email\n- phone\n- departamento\n- producto\n- field_202ee15 (acceptance)\n- field_72e3b62 (acceptance)\n- visitor (hidden)\n\nEnvía el POST como **form-urlencoded anidado** (`fields[name][value]=...`)."
-    },
-    {
-      "id": "a1b2c3d4e5f60004",
-      "type": "text",
-      "x": 420,
-      "y": 60,
-      "width": 460,
-      "height": 320,
-      "text": "## Cloudflare Worker: laia-webhook\n\nURL: `https://laia-webhook.rony-parra.workers.dev/?url=<landing>&verticality=<vertical>&api=<api-destino>`\n\n**Qué hace:**\n1. Recibe el POST con form-data anidado\n2. `parseNestedFormData()` → objeto `payload`\n3. Lee `url`, `verticality`, `api` de los query params\n4. Normaliza `sendUrl` (landing interno → URL pública)\n5. Construye `laiaPayload` (ver mapeo de campos →)\n6. `fetch(queryParams.api, POST, laiaPayload)` directo a LAIA\n\n⚠️ Problema: la API destino (`api-tracking.laia-digital.com`) **no es de ICC** → hay que cambiarla."
-    },
-    {
-      "id": "a1b2c3d4e5f60005",
-      "type": "text",
-      "x": 940,
-      "y": 140,
-      "width": 420,
-      "height": 220,
-      "text": "## API actual (a reemplazar)\n`https://api-tracking.laia-digital.com/api/1/Lead/insert/REDACTED`\n\nRecibe el `laiaPayload` directo desde el Worker.\n\nEsta es la pieza que sale del flujo."
-    },
-    {
-      "id": "a1b2c3d4e5f60006",
-      "type": "group",
-      "x": 0,
-      "y": 460,
-      "width": 1400,
-      "height": 320,
-      "label": "Flujo PROPUESTO (requerido)",
-      "color": "4"
-    },
-    {
-      "id": "a1b2c3d4e5f60007",
-      "type": "text",
-      "x": 40,
-      "y": 560,
-      "width": 320,
-      "height": 160,
-      "text": "## Landing MAPFRE\n(mismo formulario, sin cambios)"
-    },
-    {
-      "id": "a1b2c3d4e5f60008",
-      "type": "text",
-      "x": 420,
-      "y": 520,
-      "width": 460,
-      "height": 240,
-      "text": "## Webhook n8n (nuevo)\n\nReemplaza el llamado directo a la API de LAIA.\n\n**Debe:**\n1. Recibir el mismo payload que hoy recibe el Worker (o el `laiaPayload` ya armado — por definir)\n2. Validar / transformar si aplica\n3. Reenviar a la app **LAIA**\n\n**Pendiente de definir:**\n- ¿El Worker sigue existiendo y solo cambia la URL destino por la del webhook de n8n?\n- ¿O n8n reemplaza también el parseo de form-data?\n- URL definitiva del webhook de n8n"
-    },
-    {
-      "id": "a1b2c3d4e5f60009",
-      "type": "text",
-      "x": 940,
-      "y": 560,
-      "width": 420,
-      "height": 160,
-      "text": "## App LAIA\n\nRecibe desde n8n el lead ya formateado: `visitorId`, `formFields`, `serviceFields`, `trackingFields` (mismo payload de hoy)."
-    },
-    {
-      "id": "a1b2c3d4e5f6000a",
-      "type": "text",
-      "x": 0,
-      "y": 820,
-      "width": 420,
-      "height": 200,
-      "text": "## Por qué el cambio\nLa API que hoy recibe el lead (`api-tracking.laia-digital.com`) **no es de ICC**.\n\nSe necesita que el dato pase por un webhook de **n8n** (de ICC) y que n8n sea quien entregue a LAIA."
-    },
-    {
-      "id": "a1b2c3d4e5f6000b",
-      "type": "text",
-      "x": 1500,
-      "y": 0,
-      "width": 480,
-      "height": 420,
-      "text": "## Payload de entrada (WordPress → Worker)\n\nPOST con campos anidados `fields[<campo>][value]`:\n\n```json\n{\n  \"fields\": {\n    \"name\": { \"value\": \"<NOMBRE>\" },\n    \"documento\": { \"value\": \"<DOCUMENTO>\" },\n    \"email\": { \"value\": \"<EMAIL>\" },\n    \"phone\": { \"value\": \"<TELEFONO>\" },\n    \"departamento\": { \"value\": \"Antioquia\" },\n    \"producto\": { \"value\": \"Seguro de Arrendamiento\" },\n    \"field_202ee15\": { \"value\": \"on\" },\n    \"field_72e3b62\": { \"value\": \"on\" },\n    \"visitor\": { \"value\": \"\" }\n  },\n  \"form\": { \"id\": \"7fd974d8\", \"name\": \"multiproducto\" }\n}\n```\n\n*(valores anonimizados — el ejemplo original traía nombre/documento/email/teléfono reales)*"
-    },
-    {
-      "id": "a1b2c3d4e5f6000d",
-      "type": "text",
-      "x": 2040,
-      "y": 0,
-      "width": 560,
-      "height": 460,
-      "text": "## Mapeo de campos (Worker actual)\n\n| Campo WordPress | → | Campo LAIA |\n|---|---|---|\n| `visitor.value` | → | `visitorId` |\n| `phone.value` | → | `formFields.phone` |\n| `name.value` | → | `formFields.name` |\n| — | → | `formFields.firstName` (vacío) |\n| — | → | `formFields.lastName` (vacío) |\n| `email.value` | → | `formFields.email` |\n| `url` (query, normalizado) | → | `formFields.url` |\n| `departamento.value` | → | `formFields.province` |\n| *(generado)* `new Date()` | → | `formFields.c2cDate` |\n| `producto.value` | → | `formFields.verticality` |\n| `field_202ee15.value==='on'` | → | `formFields.optin` ('Si'/'No') |\n| `field_72e3b62.value==='on'` | → | `formFields.internationalDP` ('true'/'false') |\n| `documento.value` | → | `formFields.customData2` |\n\nFijos: `serviceFields.form_provider='Mapfre'`, `serviceFields.form_source='form_extension'`, `trackingFields.visitor_country` = header `cf-ipcountry`."
-    },
-    {
-      "id": "a1b2c3d4e5f6000c",
-      "type": "text",
-      "x": 2660,
-      "y": 0,
-      "width": 480,
-      "height": 460,
-      "text": "## Payload de salida (hoy va directo a LAIA)\n\n```json\n{\n  \"visitorId\": \"\",\n  \"formFields\": {\n    \"phone\": \"<TELEFONO>\",\n    \"name\": \"<NOMBRE>\",\n    \"firstName\": \"\",\n    \"lastName\": \"\",\n    \"email\": \"<EMAIL>\",\n    \"url\": \"https://www.mapfreseguros.com.co/formulario-multiproducto/\",\n    \"province\": \"Antioquia\",\n    \"c2cDate\": \"2026-10-15 00:00:00\",\n    \"verticality\": \"Seguro de Arrendamiento\",\n    \"optin\": \"Si\",\n    \"internationalDP\": \"true\",\n    \"customData2\": \"<DOCUMENTO>\"\n  },\n  \"serviceFields\": {\n    \"form_provider\": \"Mapfre\",\n    \"form_source\": \"form_extension\"\n  },\n  \"trackingFields\": {\n    \"visitor_country\": \"CO\"\n  }\n}\n```\n\nEste objeto **debe seguir llegando a LAIA**, solo que ahora pasando por n8n en vez de ir directo."
-    },
-    {
-      "id": "a1b2c3d4e5f6000e",
-      "type": "text",
-      "x": 1500,
-      "y": 480,
-      "width": 700,
-      "height": 480,
-      "text": "## Código actual (Cloudflare Worker — referencia)\n\n```js\nconst laiaPayload = {\n  visitorId: payload.fields?.visitor?.value,\n  formFields: {\n    phone: payload.fields?.phone?.value,\n    name: payload.fields?.name?.value,\n    firstName: '',\n    lastName: '',\n    email: payload.fields?.email?.value || '',\n    url: sendUrl,\n    province: payload.fields?.departamento?.value,\n    c2cDate: new Date().toISOString().replace('T',' ').split('.')[0],\n    verticality: payload.fields?.producto?.value,\n    optin: payload.fields.field_202ee15?.value === 'on' ? 'Si' : 'No',\n    internationalDP: payload.fields.field_72e3b62?.value === 'on' ? 'true' : 'false',\n    customData2: payload.fields?.documento?.value,\n  },\n  serviceFields: { form_provider: 'Mapfre', form_source: 'form_extension' },\n  trackingFields: { visitor_country: request.headers.get('cf-ipcountry') || '' }\n};\n\nawait fetch(queryParams.api, {\n  method: 'POST',\n  headers: { 'Content-Type': 'application/json' },\n  body: JSON.stringify(laiaPayload)\n});\n```\n\nURL actual del worker:\n`https://laia-webhook.rony-parra.workers.dev/?url=<landing>&verticality=<vertical>&api=<api-destino>`"
-    }
-  ],
-  "edges": [
-    {
-      "id": "b1c2d3e4f5a60001",
-      "fromNode": "a1b2c3d4e5f60003",
-      "fromSide": "right",
-      "toNode": "a1b2c3d4e5f60004",
-      "toSide": "left",
-      "toEnd": "arrow",
-      "label": "POST form-data"
-    },
-    {
-      "id": "b1c2d3e4f5a60002",
-      "fromNode": "a1b2c3d4e5f60004",
-      "fromSide": "right",
-      "toNode": "a1b2c3d4e5f60005",
-      "toSide": "left",
-      "toEnd": "arrow",
-      "label": "POST laiaPayload"
-    },
-    {
-      "id": "b1c2d3e4f5a60003",
-      "fromNode": "a1b2c3d4e5f60007",
-      "fromSide": "right",
-      "toNode": "a1b2c3d4e5f60008",
-      "toSide": "left",
-      "toEnd": "arrow",
-      "label": "POST form-data"
-    },
-    {
-      "id": "b1c2d3e4f5a60004",
-      "fromNode": "a1b2c3d4e5f60008",
-      "fromSide": "right",
-      "toNode": "a1b2c3d4e5f60009",
-      "toSide": "left",
-      "toEnd": "arrow",
-      "label": "reenvía lead"
-    },
-    {
-      "id": "b1c2d3e4f5a60005",
-      "fromNode": "a1b2c3d4e5f6000b",
-      "fromSide": "right",
-      "toNode": "a1b2c3d4e5f6000d",
-      "toSide": "left",
-      "toEnd": "arrow",
-      "label": "input"
-    },
-    {
-      "id": "b1c2d3e4f5a60006",
-      "fromNode": "a1b2c3d4e5f6000d",
-      "fromSide": "right",
-      "toNode": "a1b2c3d4e5f6000c",
-      "toSide": "left",
-      "toEnd": "arrow",
-      "label": "output"
-    },
-    {
-      "id": "b1c2d3e4f5a60007",
-      "fromNode": "a1b2c3d4e5f60004",
-      "fromSide": "bottom",
-      "toNode": "a1b2c3d4e5f6000e",
-      "toSide": "top",
-      "toEnd": "arrow",
-      "label": "implementa"
-    },
-    {
-      "id": "b1c2d3e4f5a60008",
-      "fromNode": "a1b2c3d4e5f6000a",
-      "fromSide": "right",
-      "toNode": "a1b2c3d4e5f60006",
-      "toSide": "left",
-      "toEnd": "arrow",
-      "label": "justifica"
-    },
-    {
-      "id": "b1c2d3e4f5a60009",
-      "fromNode": "a1b2c3d4e5f60008",
-      "fromSide": "right",
-      "toNode": "a1b2c3d4e5f6000c",
-      "toSide": "bottom",
-      "toEnd": "arrow",
-      "label": "debe producir el mismo payload"
-    }
-  ]
+	"nodes":[
+		{"id":"a1b2c3d4e5f60001","type":"text","x":0,"y":-260,"width":900,"height":200,"text":"# Integración MAPFRE → LAIA vía n8n\n\nMigración del webhook actual (Cloudflare Worker) a un flujo intermedio con **n8n**, porque la API actual que recibe los leads **no es de ICC**.\n\nVer también: [Módulo WhatsApp](Modulo-WhatsApp.md) (otro caso de integración vía webhook)."},
+		{"id":"a1b2c3d4e5f6000f","type":"link","x":950,"y":-260,"width":350,"height":140,"url":"https://www.mapfreseguros.com.co/"},
+		{"id":"a1b2c3d4e5f60002","type":"group","x":0,"y":0,"width":1400,"height":400,"label":"Flujo ACTUAL","color":"1"},
+		{"id":"a1b2c3d4e5f60003","type":"text","x":40,"y":140,"width":320,"height":220,"text":"## Landing MAPFRE\nFormulario WordPress con campos:\n- name\n- documento\n- email\n- phone\n- departamento\n- producto\n- field_202ee15 (acceptance)\n- field_72e3b62 (acceptance)\n- visitor (hidden)\n\nEnvía el POST como **form-urlencoded anidado** (`fields[name][value]=...`)."},
+		{"id":"a1b2c3d4e5f60004","type":"text","x":420,"y":60,"width":460,"height":320,"text":"## Cloudflare Worker: laia-webhook\n\nURL: `https://laia-webhook.rony-parra.workers.dev/?url=<landing>&verticality=<vertical>&api=<api-destino>`\n\n**Qué hace:**\n1. Recibe el POST con form-data anidado\n2. `parseNestedFormData()` → objeto `payload`\n3. Lee `url`, `verticality`, `api` de los query params\n4. Normaliza `sendUrl` (landing interno → URL pública)\n5. Construye `laiaPayload` (ver mapeo de campos →)\n6. `fetch(queryParams.api, POST, laiaPayload)` directo a LAIA\n\n⚠️ Problema: la API destino (`api-tracking.laia-digital.com`) **no es de ICC** → hay que cambiarla."},
+		{"id":"a1b2c3d4e5f60005","type":"text","x":940,"y":140,"width":420,"height":220,"text":"## API actual (a reemplazar)\n`https://api-tracking.laia-digital.com/api/1/Lead/insert/REDACTED`\n\nRecibe el `laiaPayload` directo desde el Worker.\n\nEsta es la pieza que sale del flujo."},
+		{"id":"a1b2c3d4e5f60006","type":"group","x":0,"y":460,"width":1400,"height":320,"label":"Flujo PROPUESTO (requerido)","color":"4"},
+		{"id":"a1b2c3d4e5f60007","type":"text","x":40,"y":560,"width":320,"height":160,"text":"## Landing MAPFRE\n(mismo formulario, sin cambios)"},
+		{"id":"a1b2c3d4e5f60008","type":"text","x":420,"y":520,"width":460,"height":240,"text":"## Webhook n8n (nuevo)\n\nReemplaza el llamado directo a la API de LAIA.\n\n**Debe:**\n1. Recibir el mismo payload que hoy recibe el Worker (o el `laiaPayload` ya armado — por definir)\n2. Validar / transformar si aplica\n3. Reenviar a la app **LAIA**\n\n**Pendiente de definir:**\n- ¿El Worker sigue existiendo y solo cambia la URL destino por la del webhook de n8n?\n- ¿O n8n reemplaza también el parseo de form-data?\n- URL definitiva del webhook de n8n"},
+		{"id":"a1b2c3d4e5f60009","type":"text","x":940,"y":560,"width":420,"height":160,"text":"## App LAIA\n\nRecibe desde n8n el lead ya formateado: `visitorId`, `formFields`, `serviceFields`, `trackingFields` (mismo payload de hoy)."},
+		{"id":"a1b2c3d4e5f6000a","type":"text","x":0,"y":820,"width":420,"height":200,"text":"## Por qué el cambio\nLa API que hoy recibe el lead (`api-tracking.laia-digital.com`) **no es de ICC**.\n\nSe necesita que el dato pase por un webhook de **n8n** (de ICC) y que n8n sea quien entregue a LAIA."},
+		{"id":"a1b2c3d4e5f6000b","type":"text","x":1500,"y":0,"width":480,"height":420,"text":"## Payload de entrada (WordPress → Worker)\n\nPOST con campos anidados `fields[<campo>][value]`:\n\n```json\n{\n  \"fields\": {\n    \"name\": { \"value\": \"<NOMBRE>\" },\n    \"documento\": { \"value\": \"<DOCUMENTO>\" },\n    \"email\": { \"value\": \"<EMAIL>\" },\n    \"phone\": { \"value\": \"<TELEFONO>\" },\n    \"departamento\": { \"value\": \"Antioquia\" },\n    \"producto\": { \"value\": \"Seguro de Arrendamiento\" },\n    \"field_202ee15\": { \"value\": \"on\" },\n    \"field_72e3b62\": { \"value\": \"on\" },\n    \"visitor\": { \"value\": \"\" }\n  },\n  \"form\": { \"id\": \"7fd974d8\", \"name\": \"multiproducto\" }\n}\n```\n\n*(valores anonimizados — el ejemplo original traía nombre/documento/email/teléfono reales)*"},
+		{"id":"a1b2c3d4e5f6000d","type":"text","x":2040,"y":0,"width":560,"height":460,"text":"## Mapeo de campos (Worker actual)\n\n| Campo WordPress | → | Campo LAIA |\n|---|---|---|\n| `visitor.value` | → | `visitorId` |\n| `phone.value` | → | `formFields.phone` |\n| `name.value` | → | `formFields.name` |\n| — | → | `formFields.firstName` (vacío) |\n| — | → | `formFields.lastName` (vacío) |\n| `email.value` | → | `formFields.email` |\n| `url` (query, normalizado) | → | `formFields.url` |\n| `departamento.value` | → | `formFields.province` |\n| *(generado)* `new Date()` | → | `formFields.c2cDate` |\n| `producto.value` | → | `formFields.verticality` |\n| `field_202ee15.value==='on'` | → | `formFields.optin` ('Si'/'No') |\n| `field_72e3b62.value==='on'` | → | `formFields.internationalDP` ('true'/'false') |\n| `documento.value` | → | `formFields.customData2` |\n\nFijos: `serviceFields.form_provider='Mapfre'`, `serviceFields.form_source='form_extension'`, `trackingFields.visitor_country` = header `cf-ipcountry`."},
+		{"id":"a1b2c3d4e5f6000c","type":"text","x":2660,"y":0,"width":480,"height":460,"text":"## Payload de salida (hoy va directo a LAIA)\n\n```json\n{\n  \"visitorId\": \"\",\n  \"formFields\": {\n    \"phone\": \"<TELEFONO>\",\n    \"name\": \"<NOMBRE>\",\n    \"firstName\": \"\",\n    \"lastName\": \"\",\n    \"email\": \"<EMAIL>\",\n    \"url\": \"https://www.mapfreseguros.com.co/formulario-multiproducto/\",\n    \"province\": \"Antioquia\",\n    \"c2cDate\": \"2026-10-15 00:00:00\",\n    \"verticality\": \"Seguro de Arrendamiento\",\n    \"optin\": \"Si\",\n    \"internationalDP\": \"true\",\n    \"customData2\": \"<DOCUMENTO>\"\n  },\n  \"serviceFields\": {\n    \"form_provider\": \"Mapfre\",\n    \"form_source\": \"form_extension\"\n  },\n  \"trackingFields\": {\n    \"visitor_country\": \"CO\"\n  }\n}\n```\n\nEste objeto **debe seguir llegando a LAIA**, solo que ahora pasando por n8n en vez de ir directo."},
+		{"id":"a1b2c3d4e5f6000e","type":"text","x":1500,"y":480,"width":700,"height":480,"text":"## Código actual (Cloudflare Worker — referencia)\n\n```js\nconst laiaPayload = {\n  visitorId: payload.fields?.visitor?.value,\n  formFields: {\n    phone: payload.fields?.phone?.value,\n    name: payload.fields?.name?.value,\n    firstName: '',\n    lastName: '',\n    email: payload.fields?.email?.value || '',\n    url: sendUrl,\n    province: payload.fields?.departamento?.value,\n    c2cDate: new Date().toISOString().replace('T',' ').split('.')[0],\n    verticality: payload.fields?.producto?.value,\n    optin: payload.fields.field_202ee15?.value === 'on' ? 'Si' : 'No',\n    internationalDP: payload.fields.field_72e3b62?.value === 'on' ? 'true' : 'false',\n    customData2: payload.fields?.documento?.value,\n  },\n  serviceFields: { form_provider: 'Mapfre', form_source: 'form_extension' },\n  trackingFields: { visitor_country: request.headers.get('cf-ipcountry') || '' }\n};\n\nawait fetch(queryParams.api, {\n  method: 'POST',\n  headers: { 'Content-Type': 'application/json' },\n  body: JSON.stringify(laiaPayload)\n});\n```\n\nURL actual del worker:\n`https://laia-webhook.rony-parra.workers.dev/?url=<landing>&verticality=<vertical>&api=<api-destino>`"}
+	],
+	"edges":[
+		{"id":"b1c2d3e4f5a60001","fromNode":"a1b2c3d4e5f60003","fromSide":"right","toNode":"a1b2c3d4e5f60004","toSide":"left","toEnd":"arrow","label":"POST form-data"},
+		{"id":"b1c2d3e4f5a60002","fromNode":"a1b2c3d4e5f60004","fromSide":"right","toNode":"a1b2c3d4e5f60005","toSide":"left","toEnd":"arrow","label":"POST laiaPayload"},
+		{"id":"b1c2d3e4f5a60003","fromNode":"a1b2c3d4e5f60007","fromSide":"right","toNode":"a1b2c3d4e5f60008","toSide":"left","toEnd":"arrow","label":"POST form-data"},
+		{"id":"b1c2d3e4f5a60004","fromNode":"a1b2c3d4e5f60008","fromSide":"right","toNode":"a1b2c3d4e5f60009","toSide":"left","toEnd":"arrow","label":"reenvía lead"},
+		{"id":"b1c2d3e4f5a60005","fromNode":"a1b2c3d4e5f6000b","fromSide":"right","toNode":"a1b2c3d4e5f6000d","toSide":"left","toEnd":"arrow","label":"input"},
+		{"id":"b1c2d3e4f5a60006","fromNode":"a1b2c3d4e5f6000d","fromSide":"right","toNode":"a1b2c3d4e5f6000c","toSide":"left","toEnd":"arrow","label":"output"},
+		{"id":"b1c2d3e4f5a60007","fromNode":"a1b2c3d4e5f60004","fromSide":"bottom","toNode":"a1b2c3d4e5f6000e","toSide":"top","toEnd":"arrow","label":"implementa"},
+		{"id":"b1c2d3e4f5a60008","fromNode":"a1b2c3d4e5f6000a","fromSide":"right","toNode":"a1b2c3d4e5f60006","toSide":"left","toEnd":"arrow","label":"justifica"},
+		{"id":"b1c2d3e4f5a60009","fromNode":"a1b2c3d4e5f60008","fromSide":"right","toNode":"a1b2c3d4e5f6000c","toSide":"bottom","toEnd":"arrow","label":"debe producir el mismo payload"}
+	]
 }
