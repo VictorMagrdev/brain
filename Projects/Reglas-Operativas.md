@@ -17,11 +17,12 @@ Resumen de lo que [Mónica](../People/Monica.md) me ha dicho en todas las conver
 - [ ] ¿Tiene rol? (`employee_role`: Fichaje, + Coordinador si es supervisor)
 - [ ] ¿Tiene preguntas de seguridad? Si no: reset de preguntas.
 - [ ] ¿Bloqueado? (`blocked_user = 0`)
-- [ ] ¿`dblogin` en 1 si debe entrar por BD? Contraseña exacta de test.
+- [ ] ¿`db_login` en 1 si debe entrar por BD? Contraseña exacta de test.
 - [ ] ¿Inicia sesión? Probar antes de responder.
 
 ## Cómo probar el inicio de sesión
-- `dblogin` en 1 y la contraseña **exacta** almacenada en el ambiente de test de iAttend.
+- Id del rol **Fichaje = 156** (ver [Consultas SQL](Consultas-SQL-Tickets.md)).
+- `db_login` en 1 y la contraseña **exacta** almacenada en el ambiente de test de iAttend.
 - Si inicia, está bien configurado; si no, es un problema de configuración (rol, skill, estado).
 - Hacerlo a los usuarios **afectados**, no a quien reportó el caso.
 - Adjuntar evidencia en cada ticket: que se vea el usuario, y el usuario almacenado en BD.

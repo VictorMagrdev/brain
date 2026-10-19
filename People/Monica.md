@@ -23,7 +23,7 @@ Ninguno. Todo lo conversado hasta ahora está cerrado y se guarda solo como info
 
 ## Cómo trabajamos
 - Cuando un usuario no puede ingresar y todo parece bien (existe, activo, campañas, sin bloqueos), lo primero es revisar **rol** (`employee_role`) y **skill** (`employee_skill`): sin rol no inicia sesión.
-- Si sigue fallando: revisar `dblogin` y estado, y escribirle por Teams a quien dijo que restableció la contraseña para que dé usuario y contraseña y validar el login.
+- Si sigue fallando: revisar `db_login` y estado, y escribirle por Teams a quien dijo que restableció la contraseña para que dé usuario y contraseña y validar el login.
 - Para descartar restricciones de red: pedir la IP del equipo (`ipconfig` en cmd) y que la revise quien administra la red.
 
 ## Relacionado

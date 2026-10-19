@@ -4,21 +4,17 @@
     "type": "split",
     "children": [
       {
-        "id": "0075012ef4381ee9",
+        "id": "bc95f6f6291c9482",
         "type": "tabs",
         "children": [
           {
-            "id": "ffb99158b5aefb7a",
+            "id": "1732ff73b0c06b71",
             "type": "leaf",
             "state": {
-              "type": "split-diff-view",
-              "state": {
-                "aFile": ".claudian/claudian-settings.json",
-                "bFile": ".claudian/claudian-settings.json",
-                "aRef": ""
-              },
-              "icon": "diff",
-              "title": "Diff: claudian-settings.json  (Working Tree)"
+              "type": "graph",
+              "state": {},
+              "icon": "lucide-git-fork",
+              "title": "Vista gráfica"
             }
           }
         ]
@@ -83,7 +79,8 @@
       }
     ],
     "direction": "horizontal",
-    "width": 300
+    "width": 300,
+    "collapsed": true
   },
   "right": {
     "id": "c78de88321d5d3aa",
@@ -182,9 +179,14 @@
                     {
                       "tabId": "tab-1792088874724-6dywqkr",
                       "conversationId": "conv-1792089079706-r4mpzpk2k"
+                    },
+                    {
+                      "tabId": "tab-1792181505899-e1e1f5v",
+                      "conversationId": "conv-1792089079706-r4mpzpk2k",
+                      "preview": true
                     }
                   ],
-                  "activeTabId": "tab-1792088874724-6dywqkr"
+                  "activeTabId": "tab-1792181505899-e1e1f5v"
                 }
               },
               "icon": "bot",
@@ -206,7 +208,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 514.5
+    "width": 1018.5
   },
   "left-ribbon": {
     "hiddenItems": {
@@ -221,43 +223,43 @@
       "realclaudian:Open Claudian": false
     }
   },
-  "active": "ffb99158b5aefb7a",
+  "active": "79d040eb881bfd97",
   "lastOpenFiles": [
-    "Contexto-para-Claude.md",
-    "Projects/Modulo-WhatsApp.md",
-    "README.md",
-    "skills-lock.json",
-    "Projects/Consultas-SQL-Tickets.md.tmp.23024.ae67d49f5fa7",
-    "Projects/Reglas-Operativas.md",
-    "Projects/Migracion-Grabaciones.md",
-    "Projects/Incidencia-uContact.md",
-    "Projects/Herramientas-Internas.md",
-    "Projects/Flujo-Git.md",
-    "Projects/Consultas-SQL-Tickets.md",
-    "Projects/Aprendizaje-Continuo.md",
-    "Projects/API-de-Reportes.md",
-    "People/Monica.md",
-    "People/Sergio.md",
-    "Projects/Checklist-Usuarios-GLPI.md.tmp.23024.43aa093e0e70",
-    "Projects/Migracion-Grabaciones.md.tmp.23024.fc68e8931dbb",
-    "Projects/Migracion-Grabaciones.md.tmp.23024.1df930f6096f",
-    "Projects/Modulo-WhatsApp.md.tmp.23024.6e28cf9b3296",
-    "Projects/Modulo-WhatsApp.md.tmp.23024.764210068512",
-    "Projects/Incidencia-uContact.md.tmp.23024.6aec2cda068a",
-    "Journal/2026-10-15.md.tmp.23024.5ab29b7f11e4",
-    "Journal/2026-10-15.md.tmp.23024.288516d50549",
-    "People/Alejo.md",
+    "Projects/Consultas-SQL-Tickets.md.tmp.18400.96097e68ed6a",
+    "Projects/Consultas-SQL-Tickets.md.tmp.18400.8fdf413d7be6",
+    "Projects/Checklist-Usuarios-GLPI.md.tmp.18400.da578a4c81d0",
+    "Journal/2026-10-15.md",
+    "Journal/2026-10-15.md.tmp.10228.81b09519c755",
+    "Projects/Checklist-Usuarios-GLPI.md.tmp.10228.6d405ea22152",
+    "Projects/Reglas-Operativas.md.tmp.10228.f1d474521ac5",
+    "Projects/Consultas-SQL-Tickets.md.tmp.10228.72810ff21824",
+    "Projects/Consultas-SQL-Tickets.md.tmp.10228.20896e252a8a",
+    "Projects/Reglas-Operativas.md.tmp.10228.d45ac093c2a3",
+    "Projects/Checklist-Usuarios-GLPI.md.tmp.10228.0eb4153d6742",
+    "Projects/Checklist-Usuarios-GLPI.md.tmp.10228.7d134bdb3a6e",
+    "Wiki/Migracion-Evolution-a-WAHA.md",
+    "Wiki/Evolution-API.md",
+    "People/Camila-Rojas.md",
     "People/Checho.md",
-    "Projects/Checklist-Usuarios-GLPI.md",
-    "Projects/Portal-de-Cliente.md",
-    "Templates/Plantilla-Pitch.md",
-    "Pitches/Pitches.md",
     "People/Laura-Mendez.md",
     "People/Diego-Herrera.md",
-    "People/Camila-Rojas.md",
-    "Journal/2026-10-15.md",
+    "Projects/API-de-Reportes.md",
+    "Projects/Aprendizaje-Continuo.md",
+    "Projects/Checklist-Usuarios-GLPI.md",
+    "Projects/Consultas-SQL-Tickets.md",
+    "Projects/Flujo-Git.md",
+    "Projects/Herramientas-Internas.md",
+    "Projects/Incidencia-uContact.md",
+    "Projects/Migracion-Grabaciones.md",
+    "Projects/Modulo-WhatsApp.md",
+    "Projects/Portal-de-Cliente.md",
+    "Projects/Reglas-Operativas.md",
     "Ideas/Inbox.md",
-    "Bienvenido.md",
-    "Home.md"
+    "Wiki/WAHA-con-n8n.md",
+    "Wiki/n8n-Webhook.md",
+    "Wiki/WAHA-Seguridad-y-Antibloqueo.md",
+    "Wiki/WAHA-Webhooks.md",
+    "Wiki/WAHA.md",
+    "Wiki/Webhooks-Conceptos.md"
   ]
 }

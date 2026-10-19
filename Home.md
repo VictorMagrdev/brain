@@ -22,6 +22,9 @@ Soy desarrollador de software. Llevo varios proyectos pequeños en paralelo y qu
 - [Migración de grabaciones](Projects/Migracion-Grabaciones.md)
 - [Flujo Git para subir cambios](Projects/Flujo-Git.md)
 
+## Wiki (referencia)
+- [WhatsApp, WAHA, n8n y webhooks](Wiki/Wiki-WhatsApp-Automatizacion.md): [Webhooks](Wiki/Webhooks-Conceptos.md) · [WAHA](Wiki/WAHA.md) · [WAHA webhooks](Wiki/WAHA-Webhooks.md) · [Seguridad y antibloqueo](Wiki/WAHA-Seguridad-y-Antibloqueo.md) · [n8n Webhook](Wiki/n8n-Webhook.md) · [WAHA + n8n](Wiki/WAHA-con-n8n.md) · [Evolution API](Wiki/Evolution-API.md) · [Migración Evolution → WAHA](Wiki/Migracion-Evolution-a-WAHA.md)
+
 ## Pitches
 - [Pitches](Pitches/Pitches.md): un pitch por desarrollo antes de programar
 - [Plantilla de Pitch](Templates/Plantilla-Pitch.md): Shape Up + C4 + secuencia + mockup ASCII

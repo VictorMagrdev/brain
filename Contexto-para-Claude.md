@@ -30,7 +30,7 @@ Víctor Manuel Gómez Rojas ("Vic"), desarrollador de software. Salgo a las 4:30
 6. La query de crear usuario (`INSERT` en `employee`) no asigna rol ni skill: van aparte (`employee_role`, `employee_skill`).
 
 ## Checklist de un ticket de usuario
-Existe, activo (`active = 1`), skill, rol, preguntas de seguridad, no bloqueado (`blocked_user = 0`), `dblogin`. Probar el login antes de responder: `dblogin` en 1 con la contraseña exacta del ambiente de test de iAttend, a los usuarios afectados (no a quien reportó), y adjuntar evidencia con el usuario visible. Si sigue fallando: escribir por Teams a quien restableció la clave y pedir la IP (`ipconfig`) por si hay restricción de red.
+Existe, activo (`active = 1`), skill, rol, preguntas de seguridad, no bloqueado (`blocked_user = 0`), `db_login`. Probar el login antes de responder: `db_login` en 1 con la contraseña exacta del ambiente de test de iAttend, a los usuarios afectados (no a quien reportó), y adjuntar evidencia con el usuario visible. Si sigue fallando: escribir por Teams a quien restableció la clave y pedir la IP (`ipconfig`) por si hay restricción de red.
 
 ## Cuando termino una tarea
 Funcionando en test, evidencia subida en la tarea, evidencia de lo solucionado en Sonar, tareas liberadas.
