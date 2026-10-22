@@ -1,0 +1,110 @@
+{
+  "nodes": [
+    {
+      "id": "d26a0cbdb71b0d89",
+      "type": "text",
+      "x": 0,
+      "y": 0,
+      "width": 760,
+      "height": 440,
+      "text": "# Cambio de estado de conversación\n\nSincroniza el cierre. Cuando una conversación del inbox 13 pasa a `resolved` en Chatwoot, pone `paso = 1000` en la tabla para que el próximo mensaje del cliente empiece de cero.\n\n**Disparador:** Webhook POST `/webhook/cambio-estado-conversacion-claro-movil` (Chatwoot, evento de cambio de estado; también lo llama Principal).\n\n**Llama a:** Ninguno\n\n**Es llamado por:** Chatwoot; Principal V3 (nodo Validacion error1)\n\n**Nodos:** 5  ·  Detalle: [[Documentacion-Cambio-Estado-Conversacion]]",
+      "color": "4"
+    },
+    {
+      "id": "5c10da1340215d03",
+      "type": "text",
+      "x": 820,
+      "y": 0,
+      "width": 380,
+      "height": 300,
+      "text": "### Leyenda de colores\n🟢 Disparador (webhook / cron)\n🟣 MySQL (tabla `claro_movil`)\n🟡 Condición (IF / Switch)\n🟠 Variables / código\n🔵 Chatwoot / HTTP\n🔴 Envío WhatsApp (hay que cambiarlo a WAHA)\n\n⚠️ = nodo a intervenir en la migración a WAHA."
+    },
+    {
+      "id": "6415052fb377bd4e",
+      "type": "text",
+      "x": 0,
+      "y": 556,
+      "width": 440,
+      "height": 270,
+      "text": "## Webhook\n`Webhook`\n\nRecibe de Chatwoot el cambio de estado de la conversación.\n\n**Maneja / produce:**\n- POST /webhook/cambio-estado-conversacion-claro-movil\n",
+      "color": "4"
+    },
+    {
+      "id": "226ad51b8f6a2f42",
+      "type": "text",
+      "x": 740,
+      "y": 544,
+      "width": 440,
+      "height": 294,
+      "text": "## Switch\n`Switch`\n\nFiltra por `status`: solo continúa si es `resolved`.\n\n**Lee:** `Webhook.body.status`\n\n**Maneja / produce:**\n- salida resolved ⇢ resolved\n",
+      "color": "3"
+    },
+    {
+      "id": "ab1cb59c61267d05",
+      "type": "text",
+      "x": 1480,
+      "y": 532,
+      "width": 440,
+      "height": 318,
+      "text": "## inbox\n`IF`\n\nFiltra que el inbox sea el 13.\n\n**Lee:** `Webhook.body.inbox_id`, `Webhook.body.messages`, `Webhook.body.contact_inbox.inbox_id`\n\n**Maneja / produce:**\n- Number($('Webhook').item.json.body.inbox_id ?? $('Webhook').item.json.body.messages?.[0]?.\n",
+      "color": "3"
+    },
+    {
+      "id": "8e1ca94425d9a8e2",
+      "type": "text",
+      "x": 2220,
+      "y": 520,
+      "width": 440,
+      "height": 342,
+      "text": "## Cerrar conversación\n`MySQL`\n\nPone `paso = 1000` al último registro del cliente (por `source_id`).\n\n**Lee:** `(entrada).body.contact_inbox.source_id`\n\n**Maneja / produce:**\n- Operación: UPDATE sobre `claro_movil`\n- Escribe: paso, fecha_modificacion\n",
+      "color": "6"
+    },
+    {
+      "id": "50a5161c51340c5c",
+      "type": "text",
+      "x": 2220,
+      "y": 952,
+      "width": 440,
+      "height": 160,
+      "text": "## Ignorar\n`NoOp`\n\nDescarta el evento (inbox distinto de 13).\n",
+      "color": "2"
+    }
+  ],
+  "edges": [
+    {
+      "id": "35d0dd88c80974cc",
+      "fromNode": "6415052fb377bd4e",
+      "fromSide": "right",
+      "toNode": "226ad51b8f6a2f42",
+      "toSide": "left",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "476b3ae486fb897d",
+      "fromNode": "226ad51b8f6a2f42",
+      "fromSide": "right",
+      "toNode": "ab1cb59c61267d05",
+      "toSide": "left",
+      "toEnd": "arrow",
+      "label": "resolved"
+    },
+    {
+      "id": "03e9c1b93c43a8a5",
+      "fromNode": "ab1cb59c61267d05",
+      "fromSide": "right",
+      "toNode": "8e1ca94425d9a8e2",
+      "toSide": "left",
+      "toEnd": "arrow",
+      "label": "sí"
+    },
+    {
+      "id": "62259b22e36e4360",
+      "fromNode": "ab1cb59c61267d05",
+      "fromSide": "right",
+      "toNode": "50a5161c51340c5c",
+      "toSide": "left",
+      "toEnd": "arrow",
+      "label": "no"
+    }
+  ]
+}

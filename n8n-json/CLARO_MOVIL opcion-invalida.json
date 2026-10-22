@@ -1,0 +1,1042 @@
+{
+  "name": "CLARO_MOVIL opcion-invalida",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "opcion-invalida-claro-movil",
+        "options": {}
+      },
+      "id": "6af5b8fe-e209-4933-896e-834582825a64",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -2880,
+        -464
+      ],
+      "webhookId": "f5171837-86a9-406a-98cc-356fc178e631"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT COALESCE(num_errores,0) AS num_errores FROM claro_movil WHERE cliente='{{ $('Webhook').first().json.body.cliente }}' AND tipo='CLARO_MOVIL' ORDER BY fecha_modificacion DESC LIMIT 1",
+        "options": {}
+      },
+      "id": "263e9dd7-0518-46ec-9e75-c4f8253f5373",
+      "name": "Obtener estado",
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.4,
+      "position": [
+        -2656,
+        -464
+      ],
+      "alwaysOutputData": true,
+      "credentials": {
+        "mySql": {
+          "id": "A0zURK0V73szrxpK",
+          "name": "MySQL Bot local"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return { num_errores: Number($input.first().json.num_errores||0)+1 };"
+      },
+      "id": "0ebf67da-3747-4cc8-9133-a424342c362e",
+      "name": "Code",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2432,
+        -464
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "2e5e328c-19f0-4d73-81c2-be324ae7938f",
+              "leftValue": "={{ $json.num_errores >= 3 }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "4f4f77bd-221e-4175-8845-876904c63213",
+      "name": "Validar cierre chat",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -2224,
+        -464
+      ]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "9438235b-5d4e-4498-9d35-57b4fa87ae6e",
+                    "leftValue": "={{ $('Webhook').item.json.body.estado_actual }}",
+                    "rightValue": "1",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "1"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "63cb0d9d-b4a2-44d1-9454-2678f8ad2271",
+                    "leftValue": "={{ $('Webhook').item.json.body.estado_actual }}",
+                    "rightValue": "2",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "2"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "719465ed-3895-423f-8bd9-659b421ad6a7",
+                    "leftValue": "={{ $('Webhook').item.json.body.estado_actual }}",
+                    "rightValue": "3",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "3"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "10836324-690f-49d8-be92-97a0daef942f",
+                    "leftValue": "={{ $('Webhook').item.json.body.estado_actual }}",
+                    "rightValue": "4",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "4"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "cfb37c46-da58-44bf-98f7-540c609be71e",
+                    "leftValue": "={{ $('Webhook').item.json.body.estado_actual }}",
+                    "rightValue": "5",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "5"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra"
+        }
+      },
+      "id": "4d123bc4-da8d-444c-9f6b-79609fa182f5",
+      "name": "¿Qué menú reenviar?",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -1552,
+        -128
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Webhook').first().json.body.url_chatwoot }}/api/v1/accounts/{{ $('Webhook').first().json.body.id_cuenta }}/conversations/{{ $('Webhook').first().json.body.id_conversacion }}/messages",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "api_access_token",
+              "value": "={{ $('Webhook').first().json.body.api_chatwoot }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={ \n\"content\": \"Para continuar, responde *SI* y con gusto te comparto las opciones disponibles.\", \n\"message_type\": \"outgoing\" \n}",
+        "options": {}
+      },
+      "id": "2c2df907-f614-4796-b327-7f2a682e6b43",
+      "name": "Menú 1 Chatwoot",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1344,
+        -304
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Webhook').first().json.body.url_evolution }}/message/sendText/{{ $('Webhook').first().json.body.session }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "={{ $('Webhook').first().json.body.api_evolution }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={ \n  \"number\": \"{{ $('Webhook').first().json.body.cliente }}\", \n  \"text\": \"Para continuar, responde *SI* y con gusto te comparto las opciones disponibles.\" \n}",
+        "options": {}
+      },
+      "id": "26268e2f-b981-4c00-ae70-dcc73070d0f4",
+      "name": "Menú 1 WhatsApp",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1120,
+        -304
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "UPDATE claro_movil SET num_errores='{{ $('Code').first().json.num_errores }}', fecha_modificacion=NOW() WHERE cliente='{{ $('Webhook').first().json.body.cliente }}' AND tipo='CLARO_MOVIL';",
+        "options": {}
+      },
+      "id": "ef630750-297d-487a-8c79-164137b85eb8",
+      "name": "Actualizar num_errores",
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.4,
+      "position": [
+        -432,
+        -128
+      ],
+      "credentials": {
+        "mySql": {
+          "id": "A0zURK0V73szrxpK",
+          "name": "MySQL Bot local"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://2031510-n8n.interactivo.com.co/webhook/inactividad-claro-movil",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={ \"cliente\": \"{{ $('Webhook').first().json.body.cliente }}\", \"id_conversacion\": \"{{ $('Webhook').first().json.body.id_conversacion }}\", \"session\": \"{{ $('Webhook').first().json.body.session }}\" }",
+        "options": {}
+      },
+      "id": "056dcabb-4480-4c16-8f73-19fe44a5345a",
+      "name": "Activar inactividad",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -208,
+        -128
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Webhook').first().json.body.url_evolution }}/message/sendText/{{ $('Webhook').first().json.body.session }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "={{ $('Webhook').first().json.body.api_evolution }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={ \"number\": \"{{ $('Webhook').first().json.body.cliente }}\", \"text\": \"🎉 ¡Tenemos ofertas para ti!\\n\\nElige la opción que más te interese escribiendo el número correspondiente:\\n\\n1. 💰 Plan: $52.900 📶 55 GB 📞 Minutos y mensajes ilimitados 🎬 Amazon Prime incluido\\n2. 💰 Plan: $41.900 ♾️ Gigas ilimitadas 📞 Minutos y mensajes ilimitados 🔒 Precio fijo\\n3. 💰 Plan: $43.900 📶 47 GB 📞 Minutos y mensajes ilimitados 🎬 Amazon Prime incluido\\n\\n4. Quiero conocer más ofertas y hablar con un asesor.\" }",
+        "options": {}
+      },
+      "id": "cf502df5-d5f6-4a96-b9f5-d39decdf4036",
+      "name": "Menú 4 WhatsApp1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1088,
+        256
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Webhook').first().json.body.url_chatwoot }}/api/v1/accounts/{{ $('Webhook').first().json.body.id_cuenta }}/conversations/{{ $('Webhook').first().json.body.id_conversacion }}/messages",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "api_access_token",
+              "value": "={{ $('Webhook').first().json.body.api_chatwoot }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={ \"content\": \"🎉 ¡Tenemos ofertas para ti!\\n\\nElige la opción que más te interese escribiendo el número correspondiente:\\n\\n1. 💰 Plan: $52.900 📶 55 GB 📞 Minutos y mensajes ilimitados 🎬 Amazon Prime incluido\\n2. 💰 Plan: $41.900 ♾️ Gigas ilimitadas 📞 Minutos y mensajes ilimitados 🔒 Precio fijo\\n3. 💰 Plan: $43.900 📶 47 GB 📞 Minutos y mensajes ilimitados 🎬 Amazon Prime incluido\\n\\n4. Quiero conocer más ofertas y hablar con un asesor.\", \"message_type\": \"outgoing\" }",
+        "options": {}
+      },
+      "id": "a1ab06e5-76e9-4cf7-a82a-ec3601e61a5e",
+      "name": "Menú 4 Chatwoot1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1312,
+        256
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Webhook').first().json.body.url_evolution }}/message/sendText/{{ $('Webhook').first().json.body.session }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "={{ $('Webhook').first().json.body.api_evolution }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={ \"number\": \"{{ $('Webhook').first().json.body.cliente }}\", \"text\": \"Para continuar, confírmanos si el número que deseas portar recibe llamadas.\\n\\nSI/NO\" }",
+        "options": {}
+      },
+      "id": "8ce6f05d-7216-4f07-97b9-a3d6abf70d4b",
+      "name": "Menú 3 WhatsApp1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1088,
+        48
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Webhook').first().json.body.url_chatwoot }}/api/v1/accounts/{{ $('Webhook').first().json.body.id_cuenta }}/conversations/{{ $('Webhook').first().json.body.id_conversacion }}/messages",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "api_access_token",
+              "value": "={{ $('Webhook').first().json.body.api_chatwoot }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={ \"content\": \"Para continuar, confírmanos si el número que deseas portar recibe llamadas.\\n\\nSI/NO\", \"message_type\": \"outgoing\" }",
+        "options": {}
+      },
+      "id": "0102ff1b-552c-415c-9984-2c9fa9e721e2",
+      "name": "Menú 3 Chatwoot1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1312,
+        48
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Webhook').first().json.body.url_evolution }}/message/sendText/{{ $('Webhook').first().json.body.session }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "={{ $('Webhook').first().json.body.api_evolution }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={ \"number\": \"{{ $('Webhook').first().json.body.cliente }}\", \"text\": \"Para continuar, responde con el número de la opción que corresponda:\\n\\n1. Tengo otro operador y tengo una deuda con Claro.\\n\\n2. Tengo otro operador y nunca he sido cliente Claro.\\n\\n3. Tengo otro operador y no tengo deudas con Claro.\\n\\n4. Soy cliente Claro y hago recargas.\\n\\n5. Soy cliente Claro y quiero mejorar mi plan.\" }",
+        "options": {}
+      },
+      "id": "89b592ae-37c5-43dd-aa36-de7676b84e97",
+      "name": "Menú 2 WhatsApp1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1056,
+        -128
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Webhook').first().json.body.url_chatwoot }}/api/v1/accounts/{{ $('Webhook').first().json.body.id_cuenta }}/conversations/{{ $('Webhook').first().json.body.id_conversacion }}/messages",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "api_access_token",
+              "value": "={{ $('Webhook').first().json.body.api_chatwoot }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={ \"content\": \"Para continuar, responde con el número de la opción que corresponda:\\n\\n1. Tengo otro operador y tengo una deuda con Claro.\\n\\n2. Tengo otro operador y nunca he sido cliente Claro.\\n\\n3. Tengo otro operador y no tengo deudas con Claro.\\n\\n4. Soy cliente Claro y hago recargas.\\n\\n5. Soy cliente Claro y quiero mejorar mi plan.\", \"message_type\": \"outgoing\" }",
+        "options": {}
+      },
+      "id": "ff0e5c86-f101-40fb-a1df-40deed4cc487",
+      "name": "Menú 2 Chatwoot1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1280,
+        -128
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "UPDATE claro_movil SET num_errores='{{ $('Code').first().json.num_errores }}', paso='1000', fecha_modificacion=NOW() WHERE cliente='{{ $('Webhook').first().json.body.cliente }}' AND tipo='CLARO_MOVIL';",
+        "options": {}
+      },
+      "id": "430ea818-2664-4d26-bc6c-4788732975c6",
+      "name": "Actualizar estado6",
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.4,
+      "position": [
+        -1344,
+        -592
+      ],
+      "credentials": {
+        "mySql": {
+          "id": "A0zURK0V73szrxpK",
+          "name": "MySQL Bot local"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Webhook').first().json.body.url_chatwoot }}/api/v1/accounts/{{ $('Webhook').first().json.body.id_cuenta }}/conversations/{{ $('Webhook').first().json.body.id_conversacion }}/toggle_status",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "api_access_token",
+              "value": "={{ $('Webhook').first().json.body.api_chatwoot }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={ \"status\": \"resolved\" }",
+        "options": {}
+      },
+      "id": "5db21519-58a2-42ea-a4f2-ff60931e80f7",
+      "name": "Cerrar chat (resolved)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1552,
+        -592
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Webhook').first().json.body.url_evolution }}/message/sendText/{{ $('Webhook').first().json.body.session }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "={{ $('Webhook').first().json.body.api_evolution }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={ \"number\": \"{{ $('Webhook').first().json.body.cliente }}\", \"text\": \"⌛ Como no logramos identificar tu respuesta, esta conversación se cerrará automáticamente. Recuerda que puedes contactarnos cuando lo desees.\\n\\n*¡Siempre será un gusto atenderte!* 💚\" }",
+        "options": {}
+      },
+      "id": "39510f1f-7dba-4c22-8a84-07f7f9f15013",
+      "name": "Cierre WhatsApp",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1760,
+        -592
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Webhook').first().json.body.url_chatwoot }}/api/v1/accounts/{{ $('Webhook').first().json.body.id_cuenta }}/conversations/{{ $('Webhook').first().json.body.id_conversacion }}/messages",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "api_access_token",
+              "value": "={{ $('Webhook').first().json.body.api_chatwoot }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={ \"content\": \"⌛ Como no logramos identificar tu respuesta, esta conversación se cerrará automáticamente. Recuerda que puedes contactarnos cuando lo desees.\\n\\n*¡Siempre será un gusto atenderte!* 💚\", \"message_type\": \"outgoing\" }",
+        "options": {}
+      },
+      "id": "4a93627b-41c3-4ee5-86f8-d5708b378abf",
+      "name": "Cierre Chatwoot",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1984,
+        -592
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Webhook').first().json.body.url_evolution }}/message/sendText/{{ $('Webhook').first().json.body.session }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "={{ $('Webhook').first().json.body.api_evolution }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={ \"number\": \"{{ $('Webhook').first().json.body.cliente }}\", \"text\": \"⚠️ No reconocimos tu respuesta.\\n\\nPara seguir con tu solicitud, recuerda digitar el número correspondiente a una opción válida.\" }",
+        "options": {}
+      },
+      "id": "30dcdc02-46df-4d37-ab62-87e651f765d9",
+      "name": "Aviso WhatsApp",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1744,
+        -272
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Webhook').first().json.body.url_chatwoot }}/api/v1/accounts/{{ $('Webhook').first().json.body.id_cuenta }}/conversations/{{ $('Webhook').first().json.body.id_conversacion }}/messages",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "api_access_token",
+              "value": "={{ $('Webhook').first().json.body.api_chatwoot }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={ \"content\": \"⚠️ No reconocimos tu respuesta.\\n\\nPara seguir con tu solicitud, recuerda digitar el número correspondiente a una opción válida.\", \"message_type\": \"outgoing\" }",
+        "options": {}
+      },
+      "id": "32d426bb-88c6-4946-9cc0-5f00dc750205",
+      "name": "Aviso Chatwoot",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1968,
+        -272
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Webhook').first().json.body.url_chatwoot }}/api/v1/accounts/{{ $('Webhook').first().json.body.id_cuenta }}/conversations/{{ $('Webhook').first().json.body.id_conversacion }}/messages",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "api_access_token",
+              "value": "={{ $('Webhook').first().json.body.api_chatwoot }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={ \"content\": \"Soy tu asistente virtual de Ventas de Claro Tecnología 👋🏻\\n\\nPara continuar la conversación por este canal, es necesaria tu autorización para el tratamiento de tus datos según la Política de tratamiento de la información http://bit.ly/3DtS9az y la aceptación de los términos y condiciones de funcionamiento y uso de nuestro WhatsApp Claro. https://www.claro.com.co/personas/autogestion/whatsapp/.\\n\\n¿Aceptas si o no? ☺️\", \"message_type\": \"outgoing\" }",
+        "options": {}
+      },
+      "id": "5825ff04-bbba-4130-9ee9-86b4c2e0b4f2",
+      "name": "Menú 5 Chatwoot",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1216,
+        432
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Webhook').first().json.body.url_evolution }}/message/sendText/{{ $('Webhook').first().json.body.session }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "={{ $('Webhook').first().json.body.api_evolution }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={ \"number\": \"{{ $('Webhook').first().json.body.cliente }}\", \"text\": \"Soy tu asistente virtual de Ventas de Claro Tecnología 👋🏻\\n\\nPara continuar la conversación por este canal, es necesaria tu autorización para el tratamiento de tus datos según la Política de tratamiento de la información http://bit.ly/3DtS9az y la aceptación de los términos y condiciones de funcionamiento y uso de nuestro WhatsApp Claro. https://www.claro.com.co/personas/autogestion/whatsapp/.\\n\\n¿Aceptas si o no? ☺️\" }",
+        "options": {}
+      },
+      "id": "3d633d98-c813-493c-80f8-9c8a38cfc978",
+      "name": "Menú 5 WhatsApp",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -944,
+        464
+      ],
+      "onError": "continueRegularOutput"
+    }
+  ],
+  "pinData": {
+    "Webhook": [
+      {
+        "json": {
+          "headers": {
+            "host": "2031510-n8n.interactivo.com.co",
+            "accept": "application/json,text/html,application/xhtml+xml,application/xml,text/*;q=0.9, image/*;q=0.8, */*;q=0.7",
+            "content-type": "application/json",
+            "user-agent": "axios/1.12.0",
+            "accept-encoding": "gzip, compress, deflate, br",
+            "x-forwarded-proto": "https",
+            "x-forwarded-port": "443",
+            "x-forwarded-for": "172.18.0.3",
+            "x-forwarded-host": "2031510-n8n.interactivo.com.co",
+            "x-forwarded-server": "2031510-n8n.interactivo.com.co",
+            "content-length": "356",
+            "connection": "Keep-Alive"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "cliente": "573167942953",
+            "id_conversacion": "64359",
+            "id_cuenta": "1",
+            "tipo": "CLARO_MOVIL",
+            "estado_actual": "1",
+            "url_chatwoot": "https://botconnect.interactivo.com.co:8443",
+            "api_chatwoot": "NiH1YMSRCLSNeL2h2bHaTudD",
+            "url_evolution": "https://evolution-general.interactivo.com.co",
+            "api_evolution": "1500D73E532A-4A3E-88B8-8AA72C07EE0E",
+            "session": "AGENTE_PRUEBA_1"
+          },
+          "webhookUrl": "https://2031510-n8n.interactivo.com.co/webhook/opcion-invalida-claro-movil",
+          "executionMode": "production"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Obtener estado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Obtener estado": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Validar cierre chat",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validar cierre chat": {
+      "main": [
+        [
+          {
+            "node": "Cierre Chatwoot",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Aviso Chatwoot",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Actualizar num_errores": {
+      "main": [
+        [
+          {
+            "node": "Activar inactividad",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "¿Qué menú reenviar?": {
+      "main": [
+        [
+          {
+            "node": "Menú 1 Chatwoot",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Menú 2 Chatwoot1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Menú 3 Chatwoot1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Menú 4 Chatwoot1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Menú 5 Chatwoot",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Menú 2 Chatwoot1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Menú 1 Chatwoot": {
+      "main": [
+        [
+          {
+            "node": "Menú 1 WhatsApp",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Menú 1 WhatsApp": {
+      "main": [
+        [
+          {
+            "node": "Actualizar num_errores",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Menú 4 Chatwoot1": {
+      "main": [
+        [
+          {
+            "node": "Menú 4 WhatsApp1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Menú 3 Chatwoot1": {
+      "main": [
+        [
+          {
+            "node": "Menú 3 WhatsApp1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Menú 2 Chatwoot1": {
+      "main": [
+        [
+          {
+            "node": "Menú 2 WhatsApp1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Menú 2 WhatsApp1": {
+      "main": [
+        [
+          {
+            "node": "Actualizar num_errores",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Menú 4 WhatsApp1": {
+      "main": [
+        [
+          {
+            "node": "Actualizar num_errores",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Menú 3 WhatsApp1": {
+      "main": [
+        [
+          {
+            "node": "Actualizar num_errores",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cerrar chat (resolved)": {
+      "main": [
+        [
+          {
+            "node": "Actualizar estado6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cierre WhatsApp": {
+      "main": [
+        [
+          {
+            "node": "Cerrar chat (resolved)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cierre Chatwoot": {
+      "main": [
+        [
+          {
+            "node": "Cierre WhatsApp",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aviso WhatsApp": {
+      "main": [
+        [
+          {
+            "node": "¿Qué menú reenviar?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aviso Chatwoot": {
+      "main": [
+        [
+          {
+            "node": "Aviso WhatsApp",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Menú 5 Chatwoot": {
+      "main": [
+        [
+          {
+            "node": "Menú 5 WhatsApp",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Menú 5 WhatsApp": {
+      "main": [
+        [
+          {
+            "node": "Actualizar num_errores",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "166b8cd4-3dc9-4f10-bc26-f9ebdc807622",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "96f167ef9fc598a0df86865850e52d60ab6a8266bd19871ea22602dcb4530e3d"
+  },
+  "id": "fdHQIaibgsxIwhrj",
+  "tags": []
+}

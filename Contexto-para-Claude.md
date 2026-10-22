@@ -41,6 +41,14 @@ Orden: feature, integration, develop, test, produccion. En cada rama: `checkout`
 ## Cómo trabajo un desarrollo
 Antes de programar, un **pitch** basado en Shape Up cap. 6 (Problema, Appetite, Solución, Rabbit holes, No-gos), con diagramas **Mermaid** de secuencia y C4, y **mockups en ASCII** si hay interfaz gráfica. Plantilla en `Templates/Plantilla-Pitch.md`.
 
+**Regla fija al iniciar o planificar un requerimiento: preguntar SIEMPRE, antes de proponer solución,** por:
+1. **Persistencia:** si el desarrollo mueve datos (cargues, envíos, formularios), ¿dónde se guarda lo que entra y lo que sale, qué se respalda y cuánto tiempo?
+2. **Código analítico del servicio:** ¿cuál es el del servicio o campaña? Los nombres de tablas de cada servicio suelen llevarlo (ver [Código analítico y nombres de tablas](Wiki/Codigo-Analitico-y-Nombres-de-Tablas.md)).
+Origen: el [Cargue Medicarte salió sin respaldo en BD](Projects/Retrospectiva-Cargue-Medicarte-Sin-Persistencia.md) y el nombre de la tabla se pidió tarde.
+
+## Tarea en curso: migración Evolution → WAHA (CLARO_MOVIL)
+Mónica me asignó migrar la línea CLARO_MOVIL (3014048151, fila 25 del inventario). Conversación original y qué toca: [Contexto migración WAHA](Projects/Contexto-Migracion-WAHA-CLARO_MOVIL.md). **Los JSON de `n8n-json/` son solo para documentar: nunca los modifico ni genero versiones; si hay que cambiar algo en n8n, lo hace Vic.**
+
 ## Estado actual
 Todo lo conversado hasta ahora está cerrado: es informativo, no hay pendientes. No conviertas lo que te pase en tareas salvo que te lo pida.
 

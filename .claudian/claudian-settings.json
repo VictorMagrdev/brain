@@ -45,9 +45,9 @@
       "selectedModels": [
         {
           "value": "sonnet",
-          "label": "Sonnet 5",
-          "description": "Efficient for routine tasks",
-          "resolvedModel": "claude-sonnet-5",
+          "label": "Sonnet 5.5",
+          "description": "Most efficient for simpler tasks",
+          "resolvedModel": "claude-sonnet-5-5",
           "reasoningMetadataResolved": true,
           "supportedEffortLevels": [
             "low",

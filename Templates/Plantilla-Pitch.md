@@ -9,6 +9,12 @@
 
 ---
 
+## 0. Preguntas obligatorias al iniciar
+Se hacen **antes de proponer solución**. Si alguna no tiene respuesta, queda como pregunta abierta en la sección 6.
+
+- [ ] **Persistencia:** ¿el desarrollo mueve datos? ¿Dónde se guarda lo que entra y lo que sale? ¿Qué se respalda, quién puede consultarlo y por cuánto tiempo? Si dice "solo logs", ¿cuánto histórico conservan?
+- [ ] **Código analítico del servicio:** ¿cuál es el del servicio o campaña? ¿Va en el nombre de la tabla? ¿Quién lo da (Sergio)? Ver [Código analítico y nombres de tablas](../Wiki/Codigo-Analitico-y-Nombres-de-Tablas.md).
+
 ## 1. Problema
 Qué pasa hoy y por qué duele. Incluye un caso concreto (un ticket, un usuario, una situación real), no una abstracción.
 

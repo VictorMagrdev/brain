@@ -110,14 +110,48 @@ Para el reset de preguntas, obtén primero el `employee_id` con la consulta por 
 | Coordinador | _pendiente de anotar_ |
 
 ```sql
--- Asignar Fichaje (rol por defecto, siempre)
-INSERT INTO employee_role (employee_id, role_id) VALUES (<EMPLOYEE_ID>, 156);
+-- Asignar Fichaje (rol por defecto, siempre). created_by = id de quien ejecuta (Vic = 29148)
+INSERT INTO employee_role (employee_id, role_id, created_by) VALUES (<EMPLOYEE_ID>, 156, 29148);
 
 -- Validar roles del empleado
 SELECT * FROM employee_role WHERE employee_id = <EMPLOYEE_ID>;
 ```
 
-Si es supervisor, agrega también Coordinador (misma query con su id). Confirmar con `DESCRIBE employee_role;` que la columna se llama `role_id`.
+Masivo (a todos los activos que no tengan Fichaje; pedido de Mónica, 2026-10-20). Probar primero en test y contar antes de insertar:
+
+Esquema de `employee_role` (DESCRIBE): `id` (auto), `employee_id`, `role_id`, `active` (bit, default 1), `created_by` (sin default), `created_at`/`updated_at` (default CURRENT_TIMESTAMP), `edited_by`, `deleted_by`, `deleted_at` (borrado lógico), `employe_id` (columna con typo, sin uso conocido), `Coordinador` (varchar). Solo hay que dar `employee_id`, `role_id` y `created_by`; el resto se llena solo o queda NULL. "Tiene el rol" = fila con `active = 1` y `deleted_at IS NULL`.
+
+```sql
+-- 1) Cuántos se afectan
+SELECT COUNT(*) AS por_asignar
+FROM employee e
+LEFT JOIN employee_role r
+       ON r.employee_id = e.id AND r.role_id = 156
+      AND r.active = 1 AND r.deleted_at IS NULL
+WHERE e.active = 1
+  AND r.id IS NULL;
+
+-- 2) Asignar
+INSERT INTO employee_role (employee_id, role_id, created_by)
+SELECT e.id, 156, 29148
+FROM employee e
+LEFT JOIN employee_role r
+       ON r.employee_id = e.id AND r.role_id = 156
+      AND r.active = 1 AND r.deleted_at IS NULL
+WHERE e.active = 1
+  AND r.id IS NULL;
+
+-- 3) Validar: debe dar 0
+SELECT COUNT(*) AS faltan
+FROM employee e
+LEFT JOIN employee_role r
+       ON r.employee_id = e.id AND r.role_id = 156
+      AND r.active = 1 AND r.deleted_at IS NULL
+WHERE e.active = 1
+  AND r.id IS NULL;
+```
+
+Si es supervisor, agrega también Coordinador (misma query con su id).
 
 ## Diagnóstico de "usuario no encontrado" / no inicia sesión
 

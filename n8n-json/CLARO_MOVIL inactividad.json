@@ -1,0 +1,387 @@
+{
+  "name": "CLARO_MOVIL inactividad",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 1
+            }
+          ]
+        }
+      },
+      "id": "d6f0d063-c215-48ba-ab0a-e444a1d7971f",
+      "name": "Cron 1 min",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -4048,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"tipo\": \"CLARO_MOVIL\",\n  \"id_cuenta\": \"1\",\n  \"inbox_id\": \"13\",\n  \"api_chatwoot\": \"NiH1YMSRCLSNeL2h2bHaTudD\",\n  \"url_chatwoot\": \"https://botconnect.interactivo.com.co:8443\",\n  \"api_evolution\": \"1500D73E532A-4A3E-88B8-8AA72C07EE0E\",\n  \"url_evolution\": \"https://evolution-general.interactivo.com.co\",\n  \"session\": \"AGENTE_PRUEBA_1\"\n}",
+        "options": {}
+      },
+      "id": "883c1b1b-adca-48a3-8655-8d2886301c58",
+      "name": "Variables",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -3824,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT cliente, id_conversacion, num_advertencia, session_wpp, paso, TIMESTAMPDIFF(MINUTE, fecha_modificacion, NOW()) AS minutos FROM claro_movil WHERE tipo='CLARO_MOVIL' AND id_cuenta='1' AND paso IN ('1','2','3','4','5') AND num_advertencia < 3 AND id_conversacion IS NOT NULL AND id_conversacion <> '' AND TIMESTAMPDIFF(MINUTE, fecha_modificacion, NOW()) >= (num_advertencia+1)*1",
+        "options": {}
+      },
+      "id": "78d3ae10-f074-4b2a-adcc-adbc91888c98",
+      "name": "Buscar inactivos",
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.4,
+      "position": [
+        -3600,
+        160
+      ],
+      "credentials": {
+        "mySql": {
+          "id": "A0zURK0V73szrxpK",
+          "name": "MySQL Bot local"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const out = [];\n\nfor (const item of $input.all()) {\n  const r = item.json;\n  const nivel = Number(r.num_advertencia) + 1;\n  const paso = String(r.paso);\n\n  const recordatorios = {\n    1: '😊 ¿Sigues con nosotros?\\n\\nEstamos disponibles para continuar con tu atención cuando lo desees.',\n    2: '😊 Seguimos disponibles para ayudarte.\\n\\nNotamos que no hemos recibido respuesta. Si deseas continuar, estaremos atentos.',\n    3: '🕒 Hemos finalizado esta sesión por inactividad.\\n\\nCuando decidas regresar, podrás iniciar una nueva conversación. ¡Gracias por comunicarte con nosotros!'\n  };\n\n  const menus = {\n    '1': '¡Hola! 👋\\n\\nGracias por comunicarte con el equipo de Claro.\\n\\nSerá un gusto ayudarte a encontrar la opción que\\nmejor se adapte a tus necesidades.\\n\\nSi estás de acuerdo, responde SI y uno de nuestros asesores se comunicará contigo para brindarte información sobre nuestros planes y beneficios.',\n    '2': 'Para continuar, responde con el número de la opción que corresponda:\\n1. Tengo otro operador y tengo una deuda con Claro.\\n2. Tengo otro operador y nunca he sido cliente Claro.\\n3. Tengo otro operador y no tengo deudas con Claro.\\n4. Soy cliente Claro y hago recargas.\\n5. Soy cliente Claro y quiero mejorar mi plan.',\n    '3': 'Para continuar, confírmanos si el número que deseas portar recibe llamadas.\\nSI/NO',\n    '4': '🎉 ¡Tenemos ofertas para ti!\\n\\nElige la opción que más te interese escribiendo el número correspondiente:\\n\\n1. 💰 Plan: $52.900 📶 55 GB 📞 Minutos y mensajes ilimitados 🎬 Amazon Prime incluido 💸 Descuento en tus próximas 5 facturas\\n2. 💰 Plan: $41.900 ♾️ Gigas ilimitadas 📞 Minutos y mensajes ilimitados 🔒 Precio fijo mientras mantengas el servicio activo.\\n3. 💰 Plan: $43.900 📶 47 GB 📞 Minutos y mensajes ilimitados 🎬 Amazon Prime incluido 💸 Descuento en tus próximas 5 facturas.\\n✨ Todos los planes incluyen beneficios como Claro Música, Claro Video, Claro Pay y Claro Club.\\n\\n4. Quiero conocer más ofertas y hablar con un asesor.',\n  '5': 'Soy tu asistente virtual de Ventas de Claro Tecnología 👋🏻\\n\\nPara continuar la conversación por este canal, es necesaria tu autorización para el tratamiento de tus datos según la Política de tratamiento de la información http://bit.ly/3DtS9az y la aceptación de los términos y condiciones de funcionamiento y uso de nuestro WhatsApp Claro. https://www.claro.com.co/personas/autogestion/whatsapp/.\\n\\n¿Aceptas si o no? ☺️'};\n\n  const esCierre = nivel === 3;\n  let textos;\n  if (esCierre) {\n    textos = [recordatorios[3]];\n  } else {\n    textos = [recordatorios[nivel], menus[paso]].filter(Boolean);\n  }\n\n  out.push(...textos.map((t, i) => ({\n    json: {\n      cliente: r.cliente,\n      id_conversacion: r.id_conversacion,\n      session_wpp: r.session_wpp,\n      paso,\n      nivel,\n      num_advertencia_nuevo: nivel,\n      paso_nuevo: esCierre ? '1000' : paso,\n      es_cierre: esCierre,\n      texto: t,\n      indice: i,\n      total: textos.length,\n      es_ultimo: i === textos.length - 1\n    }\n  })));\n}\n\nreturn out;"
+      },
+      "id": "1708c79e-246d-4ae5-a366-7b16a730879a",
+      "name": "Preparar recordatorio",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -3376,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Variables').item.json.url_evolution }}/message/sendText/{{ $json.session_wpp || $('Variables').item.json.session }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "={{ $('Variables').item.json.api_evolution }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={ \n\"number\": \"{{ $json.cliente }}\", \n\"text\": {{ JSON.stringify($json.texto) }}\n}",
+        "options": {
+          "batching": {
+            "batch": {
+              "batchSize": 1,
+              "batchInterval": 2000
+            }
+          }
+        }
+      },
+      "id": "c6fe45fe-2a17-43b7-bef3-d86b3ef1960d",
+      "name": "Enviar WhatsApp",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -3152,
+        256
+      ],
+      "executeOnce": false,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Variables').item.json.url_chatwoot }}/api/v1/accounts/1/conversations/{{ $('Preparar recordatorio').item.json.id_conversacion }}/messages",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "api_access_token",
+              "value": "={{ $('Variables').item.json.api_chatwoot }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={ \"content\": {{ JSON.stringify($('Preparar recordatorio').item.json.texto) }}, \"message_type\": \"outgoing\" }",
+        "options": {}
+      },
+      "id": "2d15c497-6096-4a0e-8958-465fbe1398d8",
+      "name": "Registrar en Chatwoot",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -2736,
+        256
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "UPDATE claro_movil SET num_advertencia='{{ $('Preparar recordatorio').item.json.num_advertencia_nuevo }}', paso='{{ $('Preparar recordatorio').item.json.paso_nuevo }}', fecha_modificacion=NOW() WHERE cliente='{{ $('Preparar recordatorio').item.json.cliente }}' AND tipo='CLARO_MOVIL' AND id_conversacion='{{ $('Preparar recordatorio').item.json.id_conversacion }}';",
+        "options": {}
+      },
+      "id": "5a39527a-c38f-4bf9-acd5-0bba8af1522f",
+      "name": "Actualizar advertencia",
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.4,
+      "position": [
+        -2848,
+        16
+      ],
+      "credentials": {
+        "mySql": {
+          "id": "A0zURK0V73szrxpK",
+          "name": "MySQL Bot local"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "98a23577-c7b8-4643-a7e5-37046f758b37",
+              "leftValue": "={{ $('Preparar recordatorio').item.json.es_cierre === true }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "7a85b675-5dd4-4075-92b5-0b9f350edab3",
+      "name": "Es cierre?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -2624,
+        16
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Variables').item.json.url_chatwoot }}/api/v1/accounts/1/conversations/{{ $('Preparar recordatorio').item.json.id_conversacion }}/toggle_status",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "api_access_token",
+              "value": "={{ $('Variables').item.json.api_chatwoot }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={ \"status\": \"resolved\" }",
+        "options": {}
+      },
+      "id": "67232a4a-033a-4b56-ad04-cbe84a2bfb2d",
+      "name": "Cerrar chat (resolved)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -2368,
+        -16
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "e623ea9c-4f44-4f17-875a-cf65556fcf20",
+              "leftValue": "={{ $('Preparar recordatorio').item.json.es_ultimo === true }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -3152,
+        48
+      ],
+      "id": "b55a78f5-ac2f-4e22-a605-3b8676f5a811",
+      "name": "¿Último mensaje?"
+    },
+    {
+      "parameters": {
+        "amount": 1.5
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -2960,
+        256
+      ],
+      "id": "28804f9f-1691-4ca9-866d-477788eaecfa",
+      "name": "Wait",
+      "webhookId": "dcd9819a-95f2-4afd-925d-0cfc73b2313a"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Cron 1 min": {
+      "main": [
+        [
+          {
+            "node": "Variables",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Variables": {
+      "main": [
+        [
+          {
+            "node": "Buscar inactivos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Buscar inactivos": {
+      "main": [
+        [
+          {
+            "node": "Preparar recordatorio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preparar recordatorio": {
+      "main": [
+        [
+          {
+            "node": "Enviar WhatsApp",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "¿Último mensaje?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enviar WhatsApp": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Actualizar advertencia": {
+      "main": [
+        [
+          {
+            "node": "Es cierre?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Es cierre?": {
+      "main": [
+        [
+          {
+            "node": "Cerrar chat (resolved)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "¿Último mensaje?": {
+      "main": [
+        [
+          {
+            "node": "Actualizar advertencia",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Registrar en Chatwoot",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "c62b7f36-f884-4f3b-90fc-2579325bb52b",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "96f167ef9fc598a0df86865850e52d60ab6a8266bd19871ea22602dcb4530e3d"
+  },
+  "id": "eTMNPCehuQjD2cWm",
+  "tags": []
+}

@@ -1,0 +1,421 @@
+{
+  "name": "CLARO_MOVIL Webhook_chatwoot (relay, sin imagenes)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "chatwoot-claro-movil",
+        "options": {}
+      },
+      "id": "68976efb-f24d-431b-b473-2cb4f4f809e4",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -352,
+        16
+      ],
+      "webhookId": "36eb4f33-c87f-44d7-98c7-cab5407dcac5"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "37f829af-eff3-4ad1-94ff-c7a9debf9797",
+              "leftValue": "={{ $json.body.conversation.messages[0].inbox_id }}",
+              "rightValue": 13,
+              "operator": {
+                "type": "number",
+                "operation": "equals"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "ea7cf8f9-1c0b-480f-9e3c-9666b18347d7",
+      "name": "inbox",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        288,
+        -112
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "select * \nfrom claro_movil\nwhere cliente = '{{ $('Webhook').item.json.body.conversation.contact_inbox.source_id || $('Webhook').item.json.body.conversation.meta.sender.identifier }}' and tipo = 'CLARO_MOVIL'\norder by fecha_modificacion desc limit 1",
+        "options": {}
+      },
+      "id": "95682e92-0fcf-4040-85cf-18a7c2ebeb5f",
+      "name": "Obtener estado",
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.4,
+      "position": [
+        480,
+        0
+      ],
+      "alwaysOutputData": true,
+      "credentials": {
+        "mySql": {
+          "id": "A0zURK0V73szrxpK",
+          "name": "MySQL Bot local"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"tipo\": \"CLARO_MOVIL\",\n  \"estado_actual\": \"{{ $json.paso }}\",\n  \"api_chatwoot\": \"NiH1YMSRCLSNeL2h2bHaTudD\",\n  \"url_chatwoot\": \"https://botconnect.interactivo.com.co:8443\",\n  \"api_evolution\": \"1500D73E532A-4A3E-88B8-8AA72C07EE0E\",\n  \"url_evolution\": \"https://evolution-general.interactivo.com.co\",\n  \"session\": \"AGENTE_PRUEBA_1\",\n  \"inbox_id\": 13\n}",
+        "options": {}
+      },
+      "id": "08a96fdc-0b87-4645-90cd-cef739de9b80",
+      "name": "Variables",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        640,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "366cad6f-f2a4-48d0-83fd-3b73fe254321",
+              "leftValue": "={{ String($('Obtener estado').item.json.paso).trim() }}",
+              "rightValue": "-1",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "f819d3ed-fc5e-4955-8625-472a21e89565",
+      "name": "If1",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        832,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Variables').item.json.url_evolution }}/message/sendText/{{ $('Variables').item.json.session }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "={{ $('Variables').item.json.api_evolution }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"number\": \"{{ $('Webhook').item.json.body.conversation.contact_inbox.source_id }}\",\n  \"text\": \"{{ $(\"Webhook\").item.json.body.content.replace(/\\n/g, \" \").replace(/\\r/g, \" \").replace(/\\t/g, \" \").replace(/\"/g, \" \") }}\",\n\"message_type\": \"outgoing\"\n}",
+        "options": {
+          "redirect": {
+            "redirect": {}
+          }
+        }
+      },
+      "id": "8fb6ac8e-5077-47e8-8322-4f991c6837f8",
+      "name": "Enviar Texto WhatsApp",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1216,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "94ce9f9a-613b-4890-8050-e5e763d47d38",
+              "leftValue": "={{ $json.body.message_type === 'outgoing' && $json.body.private !== true && $json.body.sender?.type === 'user' && $json.body.source_id !== 'bot' && $json.body.event === 'message_created' }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "789bdee0-e9a3-44c0-99b9-9f330901f093",
+      "name": "If2",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -128,
+        -16
+      ]
+    }
+  ],
+  "pinData": {
+    "Webhook": [
+      {
+        "json": {
+          "headers": {
+            "host": "botconnect.interactivo.com.co:8444",
+            "accept": "application/json",
+            "user-agent": "rest-client/2.1.0 (linux-musl x86_64) ruby/3.4.4p34",
+            "content-type": "application/json",
+            "accept-encoding": "gzip;q=1.0,deflate;q=0.6,identity;q=0.3",
+            "x-forwarded-proto": "https",
+            "x-forwarded-port": "8444",
+            "x-forwarded-for": "172.19.0.4",
+            "x-forwarded-host": "botconnect.interactivo.com.co:8444",
+            "x-forwarded-server": "botconnect.interactivo.com.co",
+            "content-length": "2396",
+            "connection": "Keep-Alive"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "account": {
+              "id": 1,
+              "name": "Interactivo Grupo Marktel - ICC"
+            },
+            "additional_attributes": {},
+            "content_attributes": {},
+            "content_type": "text",
+            "content": "Hi",
+            "conversation": {
+              "additional_attributes": {},
+              "can_reply": true,
+              "channel": "Channel::Api",
+              "contact_inbox": {
+                "id": 115864,
+                "contact_id": 54301,
+                "inbox_id": 13,
+                "source_id": "573167942953",
+                "created_at": "2026-07-21T15:38:58.327Z",
+                "updated_at": "2026-07-21T15:38:58.327Z",
+                "hmac_verified": false,
+                "pubsub_token": "mJtVCZiyj4nm51n8ZZrXCuGx"
+              },
+              "id": 64600,
+              "inbox_id": 13,
+              "messages": [
+                {
+                  "id": 95815,
+                  "content": "Hi",
+                  "account_id": 1,
+                  "inbox_id": 13,
+                  "conversation_id": 64600,
+                  "message_type": 1,
+                  "created_at": 1784649886,
+                  "updated_at": "2026-07-21T16:04:46.957Z",
+                  "private": false,
+                  "status": "sent",
+                  "source_id": null,
+                  "content_type": "text",
+                  "content_attributes": {},
+                  "sender_type": "User",
+                  "sender_id": 1,
+                  "external_source_ids": {},
+                  "additional_attributes": {},
+                  "processed_message_content": "Hi",
+                  "sentiment": {},
+                  "conversation": {
+                    "assignee_id": null,
+                    "unread_count": 0,
+                    "last_activity_at": 1784649886,
+                    "contact_inbox": {
+                      "source_id": "573167942953"
+                    }
+                  },
+                  "sender": {
+                    "id": 1,
+                    "name": "Administrador",
+                    "available_name": "Administrador",
+                    "avatar_url": "",
+                    "type": "user",
+                    "availability_status": null,
+                    "thumbnail": ""
+                  }
+                }
+              ],
+              "labels": [],
+              "meta": {
+                "sender": {
+                  "additional_attributes": {
+                    "city": "Manizales",
+                    "country": "Colombia",
+                    "description": "",
+                    "company_name": "Interactivo",
+                    "country_code": "CO",
+                    "avatar_url_hash": "0d29a1546907eb5e96c5d63425668f6fb8fdf505d854420b0d36f15a58ab7f47",
+                    "social_profiles": {
+                      "github": "",
+                      "twitter": "",
+                      "facebook": "",
+                      "linkedin": "",
+                      "instagram": ""
+                    },
+                    "last_avatar_sync_at": "2026-07-16T13:38:33Z"
+                  },
+                  "custom_attributes": {},
+                  "email": "carlos.losada@interactivo.com.co",
+                  "id": 54301,
+                  "identifier": null,
+                  "name": "Carlos  Losada",
+                  "phone_number": "+573167942953",
+                  "thumbnail": "",
+                  "blocked": false,
+                  "type": "contact"
+                },
+                "assignee": null,
+                "team": null,
+                "hmac_verified": false
+              },
+              "status": "open",
+              "custom_attributes": {},
+              "snoozed_until": null,
+              "unread_count": 0,
+              "first_reply_created_at": "2026-07-21T15:39:02.041Z",
+              "priority": null,
+              "waiting_since": 0,
+              "agent_last_seen_at": 1784649886,
+              "contact_last_seen_at": 0,
+              "last_activity_at": 1784649886,
+              "timestamp": 1784649886,
+              "created_at": 1784648338,
+              "updated_at": 1784649886.960921
+            },
+            "created_at": "2026-07-21T16:04:46.957Z",
+            "id": 95815,
+            "inbox": {
+              "id": 13,
+              "name": "CLARO_MOVIL"
+            },
+            "message_type": "outgoing",
+            "private": false,
+            "sender": {
+              "id": 1,
+              "name": "Administrador",
+              "email": "admin@interactivo.com.co",
+              "type": "user"
+            },
+            "source_id": null,
+            "event": "message_created"
+          },
+          "webhookUrl": "https://2031510-n8n.interactivo.com.co/webhook/chatwoot-claro-movil",
+          "executionMode": "production"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "If2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "inbox": {
+      "main": [
+        [
+          {
+            "node": "Obtener estado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Obtener estado": {
+      "main": [
+        [
+          {
+            "node": "Variables",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Variables": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Enviar Texto WhatsApp",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If2": {
+      "main": [
+        [
+          {
+            "node": "inbox",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "0e3a71ce-79ae-476f-b5ff-be2fedfddce6",
+  "meta": {
+    "instanceId": "96f167ef9fc598a0df86865850e52d60ab6a8266bd19871ea22602dcb4530e3d"
+  },
+  "id": "l8Q1uUfCJPU8Of8P",
+  "tags": []
+}

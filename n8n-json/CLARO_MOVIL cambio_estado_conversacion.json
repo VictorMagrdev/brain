@@ -1,0 +1,329 @@
+{
+  "name": "CLARO_MOVIL cambio_estado_conversacion",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "cambio-estado-conversacion-claro-movil",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -576,
+        80
+      ],
+      "id": "e7bc6981-23bd-484a-9ffb-b5d7a0a62687",
+      "name": "Webhook",
+      "webhookId": "99f35edf-0433-4af2-a9ba-8789a0fd34d3"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Webhook').item.json.body.status }}",
+                    "rightValue": "resolved",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "943e6c46-4aa7-4f4e-9f8e-d8d9437f64ce"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "resolved"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -336,
+        80
+      ],
+      "id": "c9fca03b-27ab-46af-bd71-2389fa2ffa6a",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "a9f7db1c-0000-46ae-914a-60eea293331f",
+              "leftValue": "={{ Number($('Webhook').item.json.body.inbox_id ?? $('Webhook').item.json.body.messages?.[0]?.inbox_id ?? $('Webhook').item.json.body.contact_inbox?.inbox_id) === 13 }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -128,
+        80
+      ],
+      "id": "f1caf579-5e4d-46e6-900c-5cdba0cac7e0",
+      "name": "inbox"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "UPDATE claro_movil\nSET paso = '1000',\n    fecha_modificacion = NOW()\nWHERE cliente = '{{ $json.body.contact_inbox.source_id }}'\n  AND tipo = 'CLARO_MOVIL'\nORDER BY fecha_modificacion DESC\nLIMIT 1;",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.4,
+      "position": [
+        192,
+        48
+      ],
+      "id": "c95e5850-766c-4b96-8fab-a67cac0430ac",
+      "name": "Cerrar conversación",
+      "credentials": {
+        "mySql": {
+          "id": "A0zURK0V73szrxpK",
+          "name": "MySQL Bot local"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        160,
+        256
+      ],
+      "id": "da207173-2095-4b52-9622-cb348184bd70",
+      "name": "Ignorar"
+    }
+  ],
+  "pinData": {
+    "Webhook": [
+      {
+        "json": {
+          "headers": {
+            "host": "botconnect.interactivo.com.co:8444",
+            "accept": "application/json",
+            "user-agent": "rest-client/2.1.0 (linux-musl x86_64) ruby/3.4.4p34",
+            "content-type": "application/json",
+            "accept-encoding": "gzip;q=1.0,deflate;q=0.6,identity;q=0.3",
+            "x-forwarded-proto": "https",
+            "x-forwarded-port": "8444",
+            "x-forwarded-for": "172.19.0.4",
+            "x-forwarded-host": "botconnect.interactivo.com.co:8444",
+            "x-forwarded-server": "botconnect.interactivo.com.co",
+            "content-length": "2459",
+            "connection": "Keep-Alive"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "additional_attributes": {},
+            "can_reply": true,
+            "channel": "Channel::Api",
+            "contact_inbox": {
+              "id": 115864,
+              "contact_id": 54301,
+              "inbox_id": 13,
+              "source_id": "573167942953",
+              "created_at": "2026-07-21T15:38:58.327Z",
+              "updated_at": "2026-07-21T15:38:58.327Z",
+              "hmac_verified": false,
+              "pubsub_token": "mJtVCZiyj4nm51n8ZZrXCuGx"
+            },
+            "id": 64600,
+            "inbox_id": 13,
+            "messages": [
+              {
+                "id": 95822,
+                "content": "Hola",
+                "account_id": 1,
+                "inbox_id": 13,
+                "conversation_id": 64600,
+                "message_type": 0,
+                "created_at": 1784650016,
+                "updated_at": "2026-07-21T16:06:56.439Z",
+                "private": false,
+                "status": "sent",
+                "source_id": null,
+                "content_type": "text",
+                "content_attributes": {},
+                "sender_type": "Contact",
+                "sender_id": 54301,
+                "external_source_ids": {},
+                "additional_attributes": {},
+                "processed_message_content": "Hola",
+                "sentiment": {},
+                "conversation": {
+                  "assignee_id": null,
+                  "unread_count": 0,
+                  "last_activity_at": 1784650016,
+                  "contact_inbox": {
+                    "source_id": "573167942953"
+                  }
+                },
+                "sender": {
+                  "additional_attributes": {
+                    "city": "Manizales",
+                    "country": "Colombia",
+                    "description": "",
+                    "company_name": "Interactivo",
+                    "country_code": "CO",
+                    "avatar_url_hash": "0d29a1546907eb5e96c5d63425668f6fb8fdf505d854420b0d36f15a58ab7f47",
+                    "social_profiles": {
+                      "github": "",
+                      "twitter": "",
+                      "facebook": "",
+                      "linkedin": "",
+                      "instagram": ""
+                    },
+                    "last_avatar_sync_at": "2026-07-16T13:38:33Z"
+                  },
+                  "custom_attributes": {},
+                  "email": "carlos.losada@interactivo.com.co",
+                  "id": 54301,
+                  "identifier": null,
+                  "name": "Carlos  Losada",
+                  "phone_number": "+573167942953",
+                  "thumbnail": "",
+                  "blocked": false,
+                  "type": "contact"
+                }
+              }
+            ],
+            "labels": [],
+            "meta": {
+              "sender": {
+                "additional_attributes": {
+                  "city": "Manizales",
+                  "country": "Colombia",
+                  "description": "",
+                  "company_name": "Interactivo",
+                  "country_code": "CO",
+                  "avatar_url_hash": "0d29a1546907eb5e96c5d63425668f6fb8fdf505d854420b0d36f15a58ab7f47",
+                  "social_profiles": {
+                    "github": "",
+                    "twitter": "",
+                    "facebook": "",
+                    "linkedin": "",
+                    "instagram": ""
+                  },
+                  "last_avatar_sync_at": "2026-07-16T13:38:33Z"
+                },
+                "custom_attributes": {},
+                "email": "carlos.losada@interactivo.com.co",
+                "id": 54301,
+                "identifier": null,
+                "name": "Carlos  Losada",
+                "phone_number": "+573167942953",
+                "thumbnail": "",
+                "blocked": false,
+                "type": "contact"
+              },
+              "assignee": null,
+              "team": null,
+              "hmac_verified": false
+            },
+            "status": "resolved",
+            "custom_attributes": {},
+            "snoozed_until": null,
+            "unread_count": 0,
+            "first_reply_created_at": "2026-07-21T15:39:02.041Z",
+            "priority": null,
+            "waiting_since": 0,
+            "agent_last_seen_at": 1784650016,
+            "contact_last_seen_at": 0,
+            "last_activity_at": 1784650016,
+            "timestamp": 1784650016,
+            "created_at": 1784648338,
+            "updated_at": 1784650080.6242392,
+            "event": "conversation_status_changed",
+            "changed_attributes": null
+          },
+          "webhookUrl": "https://2031510-n8n.interactivo.com.co/webhook/cambio-estado-conversacion-claro-movil",
+          "executionMode": "production"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "inbox",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "inbox": {
+      "main": [
+        [
+          {
+            "node": "Cerrar conversación",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Ignorar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "58456b72-b998-4b97-9dbc-98adcac57973",
+  "meta": {
+    "instanceId": "96f167ef9fc598a0df86865850e52d60ab6a8266bd19871ea22602dcb4530e3d"
+  },
+  "id": "tlrtZn3ei56p7B8S",
+  "tags": []
+}

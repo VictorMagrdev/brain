@@ -16,6 +16,8 @@
 ## Historial
 - Confirmó que el back del [Módulo WhatsApp](../Projects/Modulo-WhatsApp.md) funciona y tiene logs.
 
+- 2026-10-20: dijo que el flujo de WhatsApp de Medicarte lo trabajó directamente en uContact, sin código analítico y sin crear tablas. Dio el código analítico de Medicarte confirmación de cita: `2031430222` (ver [Código analítico y nombres de tablas](../Wiki/Codigo-Analitico-y-Nombres-de-Tablas.md)).
+
 ## Relacionado
 - [Mónica](Monica.md), quien asigna el trabajo
 - [Consultas SQL para tickets](../Projects/Consultas-SQL-Tickets.md)

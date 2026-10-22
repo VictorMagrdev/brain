@@ -20,7 +20,16 @@ Resumen de lo que [Mónica](../People/Monica.md) me ha dicho en todas las conver
 - [ ] ¿`db_login` en 1 si debe entrar por BD? Contraseña exacta de test.
 - [ ] ¿Inicia sesión? Probar antes de responder.
 
+## Links de iAttend
+| Ambiente | Link |
+|---|---|
+| **Test** | <https://iattendp.interactivo.com.co/dashboard> |
+| **Producción** | <https://iattend.interactivo.com.co/pages/login> |
+
+Los servidores de BD y de aplicación por ambiente están en [Incidencia uContact](Incidencia-uContact.md) (test `10.36.35.8`, producción `192.168.100.91`).
+
 ## Cómo probar el inicio de sesión
+- Probar en el link de **test** de arriba.
 - Id del rol **Fichaje = 156** (ver [Consultas SQL](Consultas-SQL-Tickets.md)).
 - `db_login` en 1 y la contraseña **exacta** almacenada en el ambiente de test de iAttend.
 - Si inicia, está bien configurado; si no, es un problema de configuración (rol, skill, estado).

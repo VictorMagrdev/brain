@@ -4,27 +4,153 @@
     "type": "split",
     "children": [
       {
-        "id": "bc95f6f6291c9482",
+        "id": "d914de782a6a2593",
         "type": "tabs",
         "children": [
           {
-            "id": "1732ff73b0c06b71",
+            "id": "73c38eb805a9da83",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "Pitches/Pitch-Persistencia-Cargue-Medicarte.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Pitch-Persistencia-Cargue-Medicarte"
+            }
+          },
+          {
+            "id": "ffd4ec6643915d1f",
+            "type": "leaf",
+            "state": {
+              "type": "graph",
+              "state": {},
+              "icon": "lucide-git-fork",
+              "title": "Vista gráfica"
+            }
+          },
+          {
+            "id": "ecb26ed92b797e33",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "Projects/Migracion-WAHA-CLARO_MOVIL.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Migracion-WAHA-CLARO_MOVIL"
+            }
+          },
+          {
+            "id": "ea5132e202d6963a",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "Projects/Contexto-Migracion-WAHA-CLARO_MOVIL.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Contexto-Migracion-WAHA-CLARO_MOVIL"
+            }
+          },
+          {
+            "id": "6d7c00421272bdce",
             "type": "leaf",
             "state": {
               "type": "canvas",
               "state": {
-                "file": "Projects/Integracion-Mapfre-LAIA-n8n.canvas",
+                "file": "n8n/CLARO_MOVIL/Principal-V3.canvas",
                 "viewState": {
-                  "x": 1570,
-                  "y": 380,
-                  "zoom": -2.6825900049723
+                  "x": 6578.19917772364,
+                  "y": 3647.762486461729,
+                  "zoom": -1.8699679118158947
                 }
               },
               "icon": "lucide-layout-dashboard",
-              "title": "Integracion-Mapfre-LAIA-n8n"
+              "title": "Principal-V3"
+            }
+          },
+          {
+            "id": "7bab1700cfd00c58",
+            "type": "leaf",
+            "state": {
+              "type": "canvas",
+              "state": {
+                "file": "n8n/CLARO_MOVIL/Relay-Chatwoot.canvas",
+                "viewState": {
+                  "x": 1072.5144897648586,
+                  "y": 851.6958828612699,
+                  "zoom": -1.6222609775688799
+                }
+              },
+              "icon": "lucide-layout-dashboard",
+              "title": "Relay-Chatwoot"
+            }
+          },
+          {
+            "id": "0a4e0ebce2592402",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "Pitches/Pitch-Migracion-WAHA-CLARO_MOVIL.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Pitch-Migracion-WAHA-CLARO_MOVIL"
+            }
+          },
+          {
+            "id": "709dc6ff4dc8632f",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "n8n/Analisis logico CLARO_MOVIL.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Analisis logico CLARO_MOVIL"
+            }
+          },
+          {
+            "id": "8f071ede32ed0ad0",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "n8n/CLARO_MOVIL/Documentacion-Principal-V3.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Documentacion-Principal-V3"
+            }
+          },
+          {
+            "id": "cbe0dae00130fdec",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "Sin título.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Sin título"
             }
           }
-        ]
+        ],
+        "currentTab": 7
       }
     ],
     "direction": "vertical"
@@ -188,12 +314,16 @@
                       "conversationId": "conv-1792089079706-r4mpzpk2k"
                     },
                     {
-                      "tabId": "tab-1792181505899-e1e1f5v",
-                      "conversationId": "conv-1792089079706-r4mpzpk2k",
+                      "tabId": "tab-1792608494612-j51o1nz",
+                      "conversationId": "conv-1792608623511-xh1w12qu6"
+                    },
+                    {
+                      "tabId": "tab-1792691583588-xp81tdc",
+                      "conversationId": "conv-1792608623511-xh1w12qu6",
                       "preview": true
                     }
                   ],
-                  "activeTabId": "tab-1792181505899-e1e1f5v"
+                  "activeTabId": "tab-1792691583588-xp81tdc"
                 }
               },
               "icon": "bot",
@@ -215,7 +345,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 1018.5
+    "width": 870.0468139648438
   },
   "left-ribbon": {
     "hiddenItems": {
@@ -230,43 +360,49 @@
       "realclaudian:Open Claudian": false
     }
   },
-  "active": "1732ff73b0c06b71",
+  "active": "79d040eb881bfd97",
   "lastOpenFiles": [
-    "Projects/Integracion-Mapfre-LAIA-n8n.canvas",
-    "Projects/Consultas-SQL-Tickets.md.tmp.18400.96097e68ed6a",
-    "Projects/Consultas-SQL-Tickets.md.tmp.18400.8fdf413d7be6",
-    "Projects/Checklist-Usuarios-GLPI.md.tmp.18400.da578a4c81d0",
-    "Journal/2026-10-15.md",
-    "Journal/2026-10-15.md.tmp.10228.81b09519c755",
-    "Projects/Checklist-Usuarios-GLPI.md.tmp.10228.6d405ea22152",
-    "Projects/Reglas-Operativas.md.tmp.10228.f1d474521ac5",
-    "Projects/Consultas-SQL-Tickets.md.tmp.10228.72810ff21824",
-    "Projects/Consultas-SQL-Tickets.md.tmp.10228.20896e252a8a",
-    "Projects/Reglas-Operativas.md.tmp.10228.d45ac093c2a3",
-    "Projects/Checklist-Usuarios-GLPI.md.tmp.10228.0eb4153d6742",
-    "Wiki/Migracion-Evolution-a-WAHA.md",
-    "Wiki/Evolution-API.md",
-    "People/Camila-Rojas.md",
-    "People/Checho.md",
-    "People/Laura-Mendez.md",
-    "People/Diego-Herrera.md",
-    "Projects/API-de-Reportes.md",
-    "Projects/Aprendizaje-Continuo.md",
-    "Projects/Checklist-Usuarios-GLPI.md",
-    "Projects/Consultas-SQL-Tickets.md",
+    "Pitches/Pitch-Migracion-WAHA-CLARO_MOVIL.md",
+    "n8n/Analisis logico CLARO_MOVIL.md",
+    "n8n/Guia de pruebas CLARO_MOVIL.md",
+    "n8n/Guia de pruebas CLARO_MOVIL.md.tmp.24548.7b2b9d6437e5",
+    "n8n/CLARO_MOVIL/Relay-Chatwoot.canvas",
+    "n8n/CLARO_MOVIL/Inactividad.canvas",
+    "n8n/CLARO_MOVIL/Opcion-Invalida.canvas",
+    "n8n/CLARO_MOVIL/Principal-V3.canvas",
+    "Home.md.tmp.18072.75a44d99c5ae",
+    "Pitches/Pitches.md.tmp.18072.25a10d3ca058",
+    "Pitches/Pitch-Migracion-WAHA-CLARO_MOVIL.md.tmp.18072.a7012aaa34d6",
+    "n8n/CLARO_MOVIL/Documentacion-Principal-V3.md",
+    "Projects/Contexto-Migracion-WAHA-CLARO_MOVIL.md",
+    "n8n/Documentacion de n8n.md",
+    "n8n/Documentacion de n8n.md.tmp.30964.d37e830f65e9",
+    "n8n/CLARO_MOVIL/Documentacion-Cambio-Estado-Conversacion.md",
+    "n8n/CLARO_MOVIL/Cambio-Estado-Conversacion.canvas",
+    "n8n/CLARO_MOVIL/Documentacion-Inactividad.md",
+    "n8n/CLARO_MOVIL/Documentacion-Opcion-Invalida.md",
+    "n8n/CLARO_MOVIL/Documentacion-Relay-Chatwoot.md",
+    "n8n/CLARO_MOVIL",
+    "n8n",
+    "Projects/Migracion-WAHA-CLARO_MOVIL.md",
+    "Projects/Contexto-Migracion-WAHA-CLARO_MOVIL.md.tmp.16424.bc849b3ee98e",
+    "n8n-json/waha",
+    "Projects/CLARO_MOVIL-Flujos-n8n.md",
+    "n8n-json/CLARO_MOVIL Webhook_chatwoot (relay, sin imagenes).json",
+    "n8n-json/README.md",
+    "Sin título.md",
+    "2026-10-21.md",
+    "Contexto-para-Claude.md",
     "Projects/Flujo-Git.md",
-    "Projects/Herramientas-Internas.md",
-    "Projects/Incidencia-uContact.md",
-    "Projects/Migracion-Grabaciones.md",
-    "Projects/Modulo-WhatsApp.md",
-    "Projects/Portal-de-Cliente.md",
-    "Projects/Reglas-Operativas.md",
-    "Ideas/Inbox.md",
-    "Wiki/WAHA-con-n8n.md",
-    "Wiki/n8n-Webhook.md",
-    "Wiki/WAHA-Seguridad-y-Antibloqueo.md",
-    "Wiki/WAHA-Webhooks.md",
-    "Wiki/WAHA.md",
-    "Wiki/Webhooks-Conceptos.md"
+    "Pitches/Pitch-Persistencia-Cargue-Medicarte.md",
+    "Wiki/Codigo-Analitico-y-Nombres-de-Tablas.md",
+    "Projects/Retrospectiva-Cargue-Medicarte-Sin-Persistencia.md",
+    "Projects/Parche-Persistencia-Cargue-Medicarte.md",
+    "Wiki/Cargue-Medicarte-Diseno-Persistencia.md",
+    "Wiki/Cargues-Masivos-Inventario-y-Patrones.md",
+    "Projects/Integracion-Mapfre-LAIA-n8n.canvas",
+    "Journal/2026-10-15.md",
+    "Wiki/Migracion-Evolution-a-WAHA.md",
+    "Wiki/Evolution-API.md"
   ]
 }

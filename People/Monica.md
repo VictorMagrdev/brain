@@ -18,6 +18,9 @@
 - Detalle completo en [Checklist de usuarios GLPI](../Projects/Checklist-Usuarios-GLPI.md).
 - Me responde rápido por chat; si algo es raro, confirmar con ella antes de asumir.
 
+## Historial reciente
+- 2026-10-20: preguntó por el código analítico de Medicarte de WhatsApp y si se había creado alguna tabla; pidió a Sergio validar el código de la campaña de confirmación de cita; propuso el prefijo `wp_` en lugar de `bot_` para la tabla (`wp_2031430222`). Ver [Código analítico y nombres de tablas](../Wiki/Codigo-Analitico-y-Nombres-de-Tablas.md).
+
 ## Pendientes con ella
 Ninguno. Todo lo conversado hasta ahora está cerrado y se guarda solo como información (ver [Migración de grabaciones](../Projects/Migracion-Grabaciones.md), [Incidencia uContact](../Projects/Incidencia-uContact.md), [Módulo WhatsApp](../Projects/Modulo-WhatsApp.md)).
 
