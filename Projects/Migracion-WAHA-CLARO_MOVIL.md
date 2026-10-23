@@ -8,12 +8,14 @@ Primera línea migrada de Evolution a WAHA, siguiendo la [guía de migración](.
 | Campo | Valor |
 |---|---|
 | Número | 3014048151 |
-| Campaña / línea | CLARO_MOVIL |
-| Tipo | ICC |
-| Estado | No verificada · En migración Waha |
+| Campaña | CLARO_MOVIL |
+| Propietario | ICC |
+| Tipo | No verificada |
+| Estado | En migración Waha |
 | Responsable | Sergio Moreno (desarrollo) |
-| Manager Evolution | `https://botconnect.interactivo.com.co:8446/manager` (carpeta CLARO_MOVIL) |
-| Agente | AGENTE_PRUEBA_1 |
+| Servidor (Evolution) | `https://botconnect.interactivo.com.co:8446/manager` (carpeta CLARO_MOVIL) |
+| Agente Evolution | AGENTE_PRUEBA_1 |
+| Agente WAHA | AGENTE_PRUEBA_1 |
 | Chatwoot | Inbox 13 - CLARO_MOVIL, `https://chatwoot-general.interactivo.com.co/` |
 | Webhook WAHA | `https://n8n-general.interactivo.com.co/webhook/recepcion-whatsapp-claro-movil` |
 

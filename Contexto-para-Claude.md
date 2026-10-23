@@ -47,7 +47,7 @@ Antes de programar, un **pitch** basado en Shape Up cap. 6 (Problema, Appetite, 
 Origen: el [Cargue Medicarte salió sin respaldo en BD](Projects/Retrospectiva-Cargue-Medicarte-Sin-Persistencia.md) y el nombre de la tabla se pidió tarde.
 
 ## Tarea en curso: migración Evolution → WAHA (CLARO_MOVIL)
-Mónica me asignó migrar la línea CLARO_MOVIL (3014048151, fila 25 del inventario). Conversación original y qué toca: [Contexto migración WAHA](Projects/Contexto-Migracion-WAHA-CLARO_MOVIL.md). **Los JSON de `n8n-json/` son solo para documentar: nunca los modifico ni genero versiones; si hay que cambiar algo en n8n, lo hace Vic.**
+Mónica me asignó migrar la línea CLARO_MOVIL (3014048151, fila 25 del inventario). Conversación original y qué toca: [Contexto migración WAHA](Projects/Contexto-Migracion-WAHA-CLARO_MOVIL.md). **Los JSON de `n8n-json/` son solo para documentar: nunca los modifico ni genero versiones; si hay que cambiar algo en n8n, lo hace Vic.** En esta migración **no aplican tablas ni código analítico: no volver a preguntarlo.** El flujo `TODO_CLARO Principal V 3.0` (ya migrado) es el modelo: sus nodos bastan para deducir los patrones, no pedir los otros flujos. Ver [Comparación](n8n/Comparacion%20TODO_CLARO%20vs%20CLARO_MOVIL.md).
 
 ## Estado actual
 Todo lo conversado hasta ahora está cerrado: es informativo, no hay pendientes. No conviertas lo que te pase en tareas salvo que te lo pida.

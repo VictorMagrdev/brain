@@ -7,7 +7,7 @@ Estudio de los 5 workflows exportados en [n8n-json](../n8n-json/README.md), para
 ## Hallazgos que importan ya
 1. **Los webhooks no coinciden.** El flujo principal escucha en `/webhook/bot-claro-movil`, pero WAHA quedó apuntando a `/webhook/recepcion-whatsapp-claro-movil`. Hay que crear ese webhook (o repuntar WAHA) y decidir cuál queda.
 2. **Dominios n8n distintos.** Los flujos se llaman entre sí con `2031510-n8n.interactivo.com.co`; el webhook de WAHA usa `n8n-general.interactivo.com.co`. Confirmar cuál es el vigente para no romper las llamadas internas (`url_n8n`, `opcion-invalida`, `inactividad`, `cambio-estado`).
-3. **Sesión:** todos los flujos usan `session = AGENTE_PRUEBA_1`, igual al agente que sincronizó Sergio. Coincide, pero es el nombre de *prueba*; confirmar que es el definitivo.
+3. **Sesión:** todos los flujos usan `session = AGENTE_PRUEBA_1`. El inventario lo lista como agente Evolution **y** como agente WAHA de la línea, así que coincide y no hay que cambiarlo.
 4. **Credenciales en claro dentro de los JSON** (API key de Chatwoot y de Evolution, repetidas en cada nodo `Set` y hasta en el body de `opcion-invalida`). No están copiadas en esta nota. Conviene moverlas a credenciales de n8n o a variables y rotarlas, porque estos archivos están en la bóveda (que tiene git).
 5. **Chatwoot en dos URLs:** los flujos usan `botconnect.interactivo.com.co:8443`; el Excel dice `chatwoot-general.interactivo.com.co`. Confirmar cuál es el real.
 

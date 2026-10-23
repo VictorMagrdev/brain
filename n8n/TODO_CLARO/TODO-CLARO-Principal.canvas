@@ -1,0 +1,1386 @@
+{
+  "nodes": [
+    {
+      "id": "bb0f1b97cf205edb",
+      "type": "text",
+      "x": 0,
+      "y": 0,
+      "width": 760,
+      "height": 440,
+      "text": "# TODO_CLARO Principal V 3.0 (ya en WAHA)\n\nPrincipal de la campaña TODO_CLARO, ya sobre WAHA. Recibe un mensaje **ya normalizado** (`remitente_id`, `texto`, `tipo`, `location`, `media`) desde un flujo de conexión previo, lo registra en Chatwoot (inbox 11), consulta el paso del cliente en `estado_2031509` y avanza una máquina de estados corta: saludo de oferta → opción 1 (llamada) u opción 2 (WhatsApp con habeas) → asignación de asesor o captura de celular e inserción del lead en la plataforma E2E/CTI. **No llama a WAHA directo**: envía por el webhook `envio-whatsapp-todo-claro`.\n\n**Disparador:** Webhook POST `/webhook/bot-whatsapp-todo-claro` (lo llama el flujo de conexión que recibe de WAHA).\n\n**Llama a:** `envio-whatsapp-todo-claro` en n8n-general (todos los envíos a WhatsApp); `opcion-invalida-todo-claro` (respuesta no válida); `cambio-estado-conversacion-todo-claro` (paso desconocido); Chatwoot (chatwoot-general), Nominatim y E2E/CTI (token e inserción de lead); WAHA solo para descargar media (`wpp-general`)\n\n**Es llamado por:** Flujo de conexión de WAHA (no incluido en las exportaciones)\n\n**Nodos:** 74 (8 huérfanos)  ·  Detalle: [[Documentacion-TODO-CLARO-Principal]]",
+      "color": "4"
+    },
+    {
+      "id": "058e1f7a47dbad56",
+      "type": "text",
+      "x": 820,
+      "y": 0,
+      "width": 380,
+      "height": 300,
+      "text": "### Leyenda de colores\n🟢 Disparador (webhook / cron)\n🟣 MySQL (tabla `claro_movil`)\n🟡 Condición (IF / Switch)\n🟠 Variables / código\n🔵 Chatwoot / HTTP\n🔴 Envío WhatsApp (hay que cambiarlo a WAHA)\n\n⚠️ = observación (resto de Evolution, credencial en el nodo o detalle). Los nodos huérfanos están agrupados abajo, sin conexión desde el webhook."
+    },
+    {
+      "id": "780f97091dd6a25c",
+      "type": "text",
+      "x": 0,
+      "y": 604,
+      "width": 440,
+      "height": 270,
+      "text": "## Webhook entrada\n`Webhook`\n\nEntrada del bot. Recibe el cuerpo **normalizado** por el flujo de conexión, no el payload crudo de WAHA.\n\n**Maneja / produce:**\n- POST /webhook/bot-whatsapp-todo-claro\n",
+      "color": "4"
+    },
+    {
+      "id": "63a83ade4437e4f6",
+      "type": "text",
+      "x": 740,
+      "y": 532,
+      "width": 440,
+      "height": 414,
+      "text": "## If2\n`IF`\n\nFiltro anti-eco: deja pasar solo si `data.key.fromMe` es falso. Todavía lee la ruta del formato Evolution (`body.data.key.fromMe`).\n\n**Lee:** `(entrada).body.data.key.fromMe`\n\n**Maneja / produce:**\n- $json.body.data.key.fromMe\n\n⚠️ **Observación:**\n- Lee la ruta del formato Evolution (`body.data.key…`) aunque el cuerpo ya viene normalizado.\n",
+      "color": "3"
+    },
+    {
+      "id": "4c5000841a040c77",
+      "type": "text",
+      "x": 1480,
+      "y": 544,
+      "width": 440,
+      "height": 390,
+      "text": "## Switch2\n`Switch`\n\nClasifica el mensaje por `body.tipo`: location, texto, audioMessage o media. La salida de audio **no está conectada** a nada.\n\n**Lee:** `(entrada).body.tipo`\n\n**Maneja / produce:**\n- salida location ⇢ location\n- salida Texto ⇢ texto\n- salida Audio ⇢ audioMessage\n- salida media ⇢ media\n",
+      "color": "3"
+    },
+    {
+      "id": "b71735d88f56e3b7",
+      "type": "text",
+      "x": 2220,
+      "y": 580,
+      "width": 440,
+      "height": 318,
+      "text": "## Obtener estado imagen\n`MySQL`\n\nBusca en `estado_2031509` la conversación del cliente para adjuntar la imagen.\n\n**Lee:** `Webhook entrada.body.remitente_id`\n\n**Maneja / produce:**\n- Operación: SELECT sobre `estado_2031509`\n- Lee: *\n",
+      "color": "6"
+    },
+    {
+      "id": "705b9ebf869f26fe",
+      "type": "text",
+      "x": 2220,
+      "y": 988,
+      "width": 440,
+      "height": 294,
+      "text": "## Normalizar ubicacion1\n`Code (JS)`\n\nToma `body.location` (latitude, longitude, live), arma el link de Google Maps y el texto de la ubicación.\n\n**Maneja / produce:**\n- Devuelve: esUbicacion, lat, lng, mapsUrl, enVivo, cliente, contenido\n",
+      "color": "2"
+    },
+    {
+      "id": "7fd026922c4dcb92",
+      "type": "text",
+      "x": 2220,
+      "y": 1372,
+      "width": 440,
+      "height": 390,
+      "text": "## Variables globales\n`Set (variables)`\n\nFija `tipo = TODO_CLARO`, una `session` y el cuerpo recibido. Ojo: `session` vale \"CLARO_MOVIL\" (copia de otro flujo).\n\n**Lee:** `Webhook entrada.body`\n\n**Maneja / produce:**\n- tipo = TODO_CLARO\n- session = CLARO_MOVIL\n- payload = {{$('Webhook entrada').item.json.body}}\n",
+      "color": "2"
+    },
+    {
+      "id": "a7d9b9b1f98c627c",
+      "type": "text",
+      "x": 2960,
+      "y": 520,
+      "width": 440,
+      "height": 438,
+      "text": "## HTTP Request13\n`HTTP Request`\n\nDescarga la imagen desde WAHA: toma `body.media.url`, cambia el dominio de Chatwoot por `wpp-general` y usa `X-Api-Key`.\n\n**Lee:** `Webhook entrada.body.media.url.replace`\n\n**Maneja / produce:**\n- GET {replace}\n- Headers: X-Api-Key\n\n⚠️ **Observación:**\n- Credencial escrita en el nodo.\n",
+      "color": "5"
+    },
+    {
+      "id": "8b0d037f6afbc34b",
+      "type": "text",
+      "x": 2960,
+      "y": 1048,
+      "width": 440,
+      "height": 390,
+      "text": "## Geocodificar\n`HTTP Request`\n\nNominatim reverse: obtiene departamento y municipio de lat/lng. Si falla, continúa.\n\n**Lee:** `(entrada).lat`, `(entrada).lng`\n\n**Maneja / produce:**\n- GET https://nominatim.openstreetmap.org/reverse\n- Headers: User-Agent\n- Query: format, lat, lon, zoom, addressdetails, accept-language\n",
+      "color": "5"
+    },
+    {
+      "id": "dfc5a5b0f2bd3cf8",
+      "type": "text",
+      "x": 2960,
+      "y": 1528,
+      "width": 440,
+      "height": 342,
+      "text": "## Log de interacción\n`MySQL`\n\nInserta el cuerpo recibido en la tabla `bot_log_v2` (tipo, cuenta, payload, cliente): registro crudo de cada interacción.\n\n**Lee:** `Webhook entrada.body`, `(entrada).tipo`, `(entrada).payload.remitente_id`\n\n**Maneja / produce:**\n- Operación: ? sobre `?`\n",
+      "color": "6"
+    },
+    {
+      "id": "31f37ad571ed9d61",
+      "type": "text",
+      "x": 3700,
+      "y": 544,
+      "width": 440,
+      "height": 390,
+      "text": "## Enviar Imagen Chatwoot\n`HTTP Request`\n\nSube la imagen a la conversación de Chatwoot como adjunto (`multipart/form-data`, mensaje entrante).\n\n**Lee:** `Obtener estado imagen.id_conversacion`\n\n**Maneja / produce:**\n- POST https://botconnect.interactivo.com.co:8443/api/v1/accounts/1/conversations/{id_conversacion}/messages\n- Headers: api_access_token, Content-Type\n",
+      "color": "5"
+    },
+    {
+      "id": "55ad599b7754c7e0",
+      "type": "text",
+      "x": 3700,
+      "y": 1108,
+      "width": 440,
+      "height": 270,
+      "text": "## Formato ubicacion\n`Code (JS)`\n\nArma el texto final con lugar, dirección aproximada, coordenadas y mapa.\n\n**Maneja / produce:**\n- Devuelve: municipio, lat, lng, mapsUrl, cliente, enVivo, departamento, contenido\n",
+      "color": "2"
+    },
+    {
+      "id": "a3569958ea59e8a6",
+      "type": "text",
+      "x": 3700,
+      "y": 1516,
+      "width": 440,
+      "height": 366,
+      "text": "## Obtener estado del usuario\n`MySQL`\n\nConsulta el último registro del cliente en `estado_2031509` (paso, conversación, etiqueta, cuenta).\n\n**Lee:** `Webhook entrada.body.remitente_id`, `Variables globales.tipo`\n\n**Maneja / produce:**\n- Operación: SELECT sobre `estado_2031509`\n- Lee: *\n",
+      "color": "6"
+    },
+    {
+      "id": "b6cad43f6ad349c3",
+      "type": "text",
+      "x": 4440,
+      "y": 1084,
+      "width": 440,
+      "height": 318,
+      "text": "## Obtener conversacion ubic1\n`MySQL`\n\nBusca en `estado_2031509` la conversación del cliente (la más reciente).\n\n**Lee:** `Normalizar ubicacion1.cliente`\n\n**Maneja / produce:**\n- Operación: SELECT sobre `estado_2031509`\n- Lee: id_conversacion, id_cuenta\n",
+      "color": "6"
+    },
+    {
+      "id": "d43b21afa70a2ea9",
+      "type": "text",
+      "x": 4440,
+      "y": 1492,
+      "width": 440,
+      "height": 798,
+      "text": "## Variables del menú\n`Set (variables)`\n\nHub de configuración. Define `integracion = WAHA`, el estado, cuenta/conversación de la BD, Chatwoot (chatwoot-general), WAHA (`url_wp`, `api_wp`, `session_wp`) e `inbox_id = 11`. Se envía completo al webhook de envío.\n\n**Lee:** `Variables globales.tipo`, `Variables globales.payload`, `(entrada).paso`, `(entrada).id_cuenta`, `(entrada).id_conversacion`, `(entrada).etiqueta_chatwoot`\n\n**Maneja / produce:**\n- integracion = WAHA\n- tipo = {{ $('Variables globales').item.json.tipo }}\n- payload = {{ $('Variables globales').item.json.payload }}\n- estado_actual = {{ $json.paso }}\n- id_cuenta = {{ $json.id_cuenta }}\n- id_conversacion = {{ $json.id_conversacion }}\n- etiqueta_chatwoot = {{ $json.etiqueta_chatwoot }}\n- api_chatwoot = <clave oculta>\n- url_chatwoot = https://chatwoot-general.interactivo.com.co\n\n⚠️ **Observación:**\n- Credencial escrita en el nodo.\n",
+      "color": "2"
+    },
+    {
+      "id": "fe61f72bf633448a",
+      "type": "text",
+      "x": 5180,
+      "y": 1036,
+      "width": 440,
+      "height": 414,
+      "text": "## Ubicacion a Chatwoot1\n`HTTP Request`\n\nPublica la ubicación como mensaje entrante en la conversación de Chatwoot.\n\n**Lee:** `Formato ubicacion.contenido`, `(entrada).id_conversacion`\n\n**Maneja / produce:**\n- POST https://botconnect.interactivo.com.co:8443/api/v1/accounts/1/conversations/{id_conversacion}/messages\n- Body: content, message_type\n- Headers: Content-Type, api_access_token\n",
+      "color": "5"
+    },
+    {
+      "id": "04ae8ced9d36ab3a",
+      "type": "text",
+      "x": 5180,
+      "y": 1624,
+      "width": 440,
+      "height": 534,
+      "text": "## Enrutar por estado1\n`Switch`\n\nSwitch de la máquina de estados: undefined/0/1000/1 → alta de contacto y saludo; 2 → opción 1/2; -1 → validar opción 1–5; 3 → solo registrar mensaje; 4 → habeas; 6 → celular; otro → Validacion error1.\n\n**Lee:** `(entrada).estado_actual`\n\n**Maneja / produce:**\n- salida undefined ⇢ undefined\n- salida 0 ⇢ 0\n- salida 1000 ⇢ 1000\n- salida 1 ⇢ 1\n- salida 2 ⇢ 2\n- salida -1 ⇢ -1\n- salida 3 ⇢ 3\n- salida 4 ⇢ 4\n",
+      "color": "3"
+    },
+    {
+      "id": "1ebc2c07598320cd",
+      "type": "text",
+      "x": 5920,
+      "y": 1624,
+      "width": 440,
+      "height": 534,
+      "text": "## Registrar mensaje asesor\n`HTTP Request`\n\nPaso 3: solo registra el mensaje del cliente como entrante en Chatwoot (el asesor ya lo atiende).\n\n**Lee:** `Variables del menú.url_chatwoot`, `Variables del menú.id_conversacion`, `Variables del menú.api_chatwoot`, `Webhook entrada.body.texto`\n\n**Maneja / produce:**\n- POST {url_chatwoot}/api/v1/accounts/1/conversations/{id_conversacion}/messages\n- Body: content, message_type\n- Headers: api_access_token, Content-Type\n\n⚠️ **Observación:**\n- Credencial escrita en el nodo.\n",
+      "color": "5"
+    },
+    {
+      "id": "e63e687f6f601476",
+      "type": "text",
+      "x": 5920,
+      "y": 2248,
+      "width": 440,
+      "height": 318,
+      "text": "## Validacion error1\n`HTTP Request`\n\nLlama a `cambio-estado-conversacion-todo-claro` enviando todas las variables del menú (estado desconocido).\n\n**Maneja / produce:**\n- POST https://2031510-n8n.interactivo.com.co/webhook/cambio-estado-conversacion-todo-claro\n- Body: \n",
+      "color": "5"
+    },
+    {
+      "id": "4dc2a1055c1c4810",
+      "type": "text",
+      "x": 5920,
+      "y": 2656,
+      "width": 440,
+      "height": 510,
+      "text": "## Enviar Mensaje Chatwoot Cliente2\n`HTTP Request`\n\nPaso -1: registra la respuesta del cliente como entrante en Chatwoot.\n\n**Lee:** `Variables del menú.url_chatwoot`, `Variables del menú.id_conversacion`, `Variables del menú.api_chatwoot`, `Webhook entrada.body.texto`\n\n**Maneja / produce:**\n- POST {url_chatwoot}/api/v1/accounts/1/conversations/{id_conversacion}/messages\n- Body: content, message_type\n- Headers: api_access_token, Content-Type\n\n⚠️ **Observación:**\n- Credencial escrita en el nodo.\n",
+      "color": "5"
+    },
+    {
+      "id": "1e468797c24311d2",
+      "type": "text",
+      "x": 5920,
+      "y": 3256,
+      "width": 440,
+      "height": 462,
+      "text": "## GET CONTACT\n`HTTP Request`\n\nBusca el contacto en Chatwoot por `remitente_id`.\n\n**Lee:** `Variables del menú.url_chatwoot`, `Variables del menú.api_chatwoot`, `(entrada).payload.remitente_id`\n\n**Maneja / produce:**\n- GET {url_chatwoot}/api/v1/accounts/1/contacts/search?q={remitente_id}\n- Headers: api_access_token, Content-Type\n\n⚠️ **Observación:**\n- Credencial escrita en el nodo.\n",
+      "color": "5"
+    },
+    {
+      "id": "08d2406f5c35f753",
+      "type": "text",
+      "x": 5920,
+      "y": 3808,
+      "width": 440,
+      "height": 486,
+      "text": "## Enviar Mensaje Chatwoot Cliente1\n`HTTP Request`\n\nPaso 2: registra la respuesta del cliente como entrante en Chatwoot.\n\n**Lee:** `Variables del menú.url_chatwoot`, `Variables del menú.id_conversacion`, `Variables del menú.api_chatwoot`, `(entrada).payload.texto`\n\n**Maneja / produce:**\n- POST {url_chatwoot}/api/v1/accounts/1/conversations/{id_conversacion}/messages\n- Body: content, message_type\n- Headers: api_access_token, Content-Type\n\n⚠️ **Observación:**\n- Credencial escrita en el nodo.\n",
+      "color": "5"
+    },
+    {
+      "id": "4c3f3d139e558229",
+      "type": "text",
+      "x": 5920,
+      "y": 4384,
+      "width": 440,
+      "height": 510,
+      "text": "## Registrar respuesta habeas\n`HTTP Request`\n\nPaso 4: registra la respuesta del cliente como entrante en Chatwoot.\n\n**Lee:** `Variables del menú.url_chatwoot`, `Variables del menú.id_conversacion`, `Variables del menú.api_chatwoot`, `Webhook entrada.body.texto`\n\n**Maneja / produce:**\n- POST {url_chatwoot}/api/v1/accounts/1/conversations/{id_conversacion}/messages\n- Body: content, message_type\n- Headers: api_access_token, Content-Type\n\n⚠️ **Observación:**\n- Credencial escrita en el nodo.\n",
+      "color": "5"
+    },
+    {
+      "id": "c0f2d7c6ef37dfe9",
+      "type": "text",
+      "x": 6660,
+      "y": 2752,
+      "width": 440,
+      "height": 318,
+      "text": "## Validar opción (1-5)\n`IF`\n\nValida que la respuesta sea \"1\" a \"5\". Otra cosa → opción inválida.\n\n**Lee:** `Webhook entrada.body.texto`\n\n**Maneja / produce:**\n- ['1','2','3','4','5'].includes(( $('Webhook entrada').item.json.body.texto || '').trim())\n",
+      "color": "3"
+    },
+    {
+      "id": "3393aabdb49fc24b",
+      "type": "text",
+      "x": 6660,
+      "y": 3340,
+      "width": 440,
+      "height": 294,
+      "text": "## Filtro Inbox 11\n`Switch`\n\nComprueba que el inbox sea el 11. Compara una constante con otra, siempre es verdadero.\n\n**Lee:** `Variables del menú.inbox_id`\n\n**Maneja / produce:**\n- salida inbox11 ⇢ 11\n",
+      "color": "3"
+    },
+    {
+      "id": "af77dd2a6dd5a560",
+      "type": "text",
+      "x": 6660,
+      "y": 3892,
+      "width": 440,
+      "height": 318,
+      "text": "## Switch\n`Switch`\n\nPaso 2: texto \"1\" → pedir celular; \"2\" → habeas; otro → opción inválida.\n\n**Lee:** `Webhook entrada.body.texto`\n\n**Maneja / produce:**\n- salida 1 ⇢ 1\n- salida 2 ⇢ 2\n",
+      "color": "3"
+    },
+    {
+      "id": "dd5344a6a760ad3d",
+      "type": "text",
+      "x": 6660,
+      "y": 4480,
+      "width": 440,
+      "height": 318,
+      "text": "## ¿Responde SI o NO?\n`IF`\n\nValida que la respuesta sea exactamente \"1\" o \"2\". Otra cosa → opción inválida.\n\n**Lee:** `Webhook entrada.body.texto`\n\n**Maneja / produce:**\n- ['1','2'].includes(( $('Webhook entrada').item.json.body.texto || '').trim())\n",
+      "color": "3"
+    },
+    {
+      "id": "c16aff1e500b3d39",
+      "type": "text",
+      "x": 7400,
+      "y": 2158,
+      "width": 440,
+      "height": 486,
+      "text": "## Enviar Mensaje Chatwoot Agente12\n`HTTP Request`\n\nPublica en Chatwoot \"Tu solicitud ha sido registrada\" (como mensaje **entrante**).\n\n**Lee:** `Variables del menú.url_chatwoot`, `Variables del menú.id_conversacion`, `Variables del menú.api_chatwoot`\n\n**Maneja / produce:**\n- POST {url_chatwoot}/api/v1/accounts/1/conversations/{id_conversacion}/messages\n- Body: content, message_type\n- Headers: api_access_token, Content-Type, \n\n⚠️ **Observación:**\n- Credencial escrita en el nodo.\n",
+      "color": "5"
+    },
+    {
+      "id": "1c03c42d099e880b",
+      "type": "text",
+      "x": 7400,
+      "y": 3340,
+      "width": 440,
+      "height": 294,
+      "text": "## Si Contacto Existe\n`IF`\n\nSi Chatwoot encontró contacto crea la conversación; si no, primero crea el contacto.\n\n**Lee:** `(entrada).meta.count`\n\n**Maneja / produce:**\n- $json.meta.count  ==  =0\n",
+      "color": "3"
+    },
+    {
+      "id": "c8e1cc84d1349fee",
+      "type": "text",
+      "x": 7400,
+      "y": 3724,
+      "width": 440,
+      "height": 294,
+      "text": "## Validacion error\n`HTTP Request`\n\nLlama a `opcion-invalida-todo-claro` enviando todas las variables del menú.\n\n**Maneja / produce:**\n- POST https://2031510-n8n.interactivo.com.co/webhook/opcion-invalida-todo-claro\n- Body: \n",
+      "color": "5"
+    },
+    {
+      "id": "22d65df013a48067",
+      "type": "text",
+      "x": 7400,
+      "y": 4108,
+      "width": 440,
+      "height": 486,
+      "text": "## Habeas Chatwoot\n`HTTP Request`\n\nPublica en Chatwoot el texto de habeas con respuesta numérica (1 autoriza, 2 no).\n\n**Lee:** `Variables del menú.url_chatwoot`, `Variables del menú.id_conversacion`, `Variables del menú.api_chatwoot`\n\n**Maneja / produce:**\n- POST {url_chatwoot}/api/v1/accounts/1/conversations/{id_conversacion}/messages\n- Body: content, message_type\n- Headers: api_access_token, Content-Type\n\n⚠️ **Observación:**\n- Credencial escrita en el nodo.\n",
+      "color": "5"
+    },
+    {
+      "id": "c1dc523a224f2c54",
+      "type": "text",
+      "x": 7400,
+      "y": 4684,
+      "width": 440,
+      "height": 486,
+      "text": "## pedir celular\n`HTTP Request`\n\nPublica en Chatwoot la petición del celular para la llamada.\n\n**Lee:** `Variables del menú.url_chatwoot`, `Variables del menú.id_conversacion`, `Variables del menú.api_chatwoot`\n\n**Maneja / produce:**\n- POST {url_chatwoot}/api/v1/accounts/1/conversations/{id_conversacion}/messages\n- Body: content, message_type\n- Headers: api_access_token, Content-Type\n\n⚠️ **Observación:**\n- Credencial escrita en el nodo.\n",
+      "color": "5"
+    },
+    {
+      "id": "edab6c085eb80644",
+      "type": "text",
+      "x": 7400,
+      "y": 5260,
+      "width": 440,
+      "height": 318,
+      "text": "## ¿Acepta habeas?\n`IF`\n\nSi la respuesta es \"1\" acepta y continúa; \"2\" rechaza.\n\n**Lee:** `Webhook entrada.body.texto`\n\n**Maneja / produce:**\n- ( $('Webhook entrada').item.json.body.texto|| '').trim() === '1'\n",
+      "color": "3"
+    },
+    {
+      "id": "b014b5f2cae39040",
+      "type": "text",
+      "x": 8140,
+      "y": 2230,
+      "width": 440,
+      "height": 342,
+      "text": "## HTTP Request11\n`HTTP Request`\n\nEnvía por WhatsApp la confirmación de solicitud registrada.\n\n**Lee:** `Variables del menú.toJsonString`\n\n**Maneja / produce:**\n- POST https://n8n-general.interactivo.com.co/webhook/envio-whatsapp-todo-claro\n- Body: variable, tipo_mensaje, mensaje\n",
+      "color": "5"
+    },
+    {
+      "id": "2c7ab55c88ac0a2e",
+      "type": "text",
+      "x": 8140,
+      "y": 3256,
+      "width": 440,
+      "height": 462,
+      "text": "## Crear Conversación\n`HTTP Request`\n\nCrea la conversación para un contacto existente.\n\n**Lee:** `Variables del menú.url_chatwoot`, `Variables del menú.api_chatwoot`, `Variables del menú.inbox_id`, `(entrada).payload[0].id`\n\n**Maneja / produce:**\n- POST {url_chatwoot}/api/v1/accounts/1/conversations\n- Body: source_id, inbox_id, contact_id\n- Headers: api_access_token, Content-Type\n\n⚠️ **Observación:**\n- Credencial escrita en el nodo.\n",
+      "color": "5"
+    },
+    {
+      "id": "d1771e1421fb159b",
+      "type": "text",
+      "x": 8140,
+      "y": 3808,
+      "width": 440,
+      "height": 510,
+      "text": "## Crea Contacto ChatWoot\n`HTTP Request`\n\nCrea el contacto con `remitente_id` como identificador y `source_id`, atributo `bot = on`.\n\n**Lee:** `Variables del menú.url_chatwoot`, `Variables del menú.api_chatwoot`, `Webhook entrada.body.remitente_id`, `Variables del menú.inbox_id`\n\n**Maneja / produce:**\n- POST {url_chatwoot}/api/v1/accounts/1/contacts\n- Body: name, identifier, inbox_id, source_id, custom_attributes, bot\n- Headers: api_access_token, Content-Type\n\n⚠️ **Observación:**\n- Credencial escrita en el nodo.\n",
+      "color": "5"
+    },
+    {
+      "id": "9d05905ffdb599e5",
+      "type": "text",
+      "x": 8140,
+      "y": 4408,
+      "width": 440,
+      "height": 342,
+      "text": "## HTTP Request5\n`HTTP Request`\n\nEnvía por WhatsApp el texto de habeas por el webhook de envío.\n\n**Lee:** `Variables del menú.toJsonString`\n\n**Maneja / produce:**\n- POST https://n8n-general.interactivo.com.co/webhook/envio-whatsapp-todo-claro\n- Body: variable, tipo_mensaje, mensaje\n",
+      "color": "5"
+    },
+    {
+      "id": "f14ab5e7098d80de",
+      "type": "text",
+      "x": 8140,
+      "y": 4840,
+      "width": 440,
+      "height": 342,
+      "text": "## HTTP Request12\n`HTTP Request`\n\nEnvía por WhatsApp \"Por favor ingrese número de celular para realizar la llamada\".\n\n**Lee:** `Variables del menú.toJsonString`\n\n**Maneja / produce:**\n- POST https://n8n-general.interactivo.com.co/webhook/envio-whatsapp-todo-claro\n- Body: variable, tipo_mensaje, mensaje\n",
+      "color": "5"
+    },
+    {
+      "id": "9adcb2b17ddd86e1",
+      "type": "text",
+      "x": 8140,
+      "y": 5272,
+      "width": 440,
+      "height": 510,
+      "text": "## Enviar Mensaje Chatwoot Agente13\n`HTTP Request`\n\nPublica en Chatwoot el menú de categorías (celulares, televisores, portátiles, equipos de sonido, otros).\n\n**Lee:** `Variables del menú.url_chatwoot`, `Variables del menú.id_conversacion`, `Variables del menú.api_chatwoot`\n\n**Maneja / produce:**\n- POST {url_chatwoot}/api/v1/accounts/1/conversations/{id_conversacion}/messages\n- Body: content, message_type\n- Headers: api_access_token, Content-Type, \n\n⚠️ **Observación:**\n- Credencial escrita en el nodo.\n",
+      "color": "5"
+    },
+    {
+      "id": "dd8e4e0eafad40a4",
+      "type": "text",
+      "x": 8140,
+      "y": 5872,
+      "width": 440,
+      "height": 486,
+      "text": "## Rechazo Chatwoot\n`HTTP Request`\n\nPublica en Chatwoot el mensaje de despedida por no autorizar el tratamiento de datos.\n\n**Lee:** `Variables del menú.url_chatwoot`, `Variables del menú.id_conversacion`, `Variables del menú.api_chatwoot`\n\n**Maneja / produce:**\n- POST {url_chatwoot}/api/v1/accounts/1/conversations/{id_conversacion}/messages\n- Body: content, message_type\n- Headers: api_access_token, Content-Type\n\n⚠️ **Observación:**\n- Credencial escrita en el nodo.\n",
+      "color": "5"
+    },
+    {
+      "id": "6ebf0d6f55ad8b5a",
+      "type": "text",
+      "x": 8880,
+      "y": 2122,
+      "width": 440,
+      "height": 558,
+      "text": "## Guardar estado menú principal2\n`MySQL`\n\nUPDATE: `telefono` = texto recibido, `paso = 3`, trazabilidad en `ori_fields`.\n\n**Lee:** `Webhook entrada.body.texto`, `Variables del menú.id_conversacion`, `Variables del menú.session`, `Webhook entrada.body.remitente_id`, `Variables del menú.tipo`, `Variables del menú.inbox_id`\n\n**Maneja / produce:**\n- Operación: UPDATE sobre `estado_2031509`\n- Escribe: telefono, paso, fecha_modificacion, id_conversacion, num_advertencia, num_errores, session_wpp, payload, ori_fields\n\n⚠️ **Observación:**\n- Lee `Variables del menú.session`, que ese nodo no define (define `session_wp`).\n",
+      "color": "6"
+    },
+    {
+      "id": "0c06ab0237ed69c4",
+      "type": "text",
+      "x": 8880,
+      "y": 3364,
+      "width": 440,
+      "height": 246,
+      "text": "## Wait5\n`Wait`\n\nEspera 3 s para que Chatwoot termine de crear la conversación.\n\n**Maneja / produce:**\n- Espera 3 s\n",
+      "color": "2"
+    },
+    {
+      "id": "c28d3cde8241f6d4",
+      "type": "text",
+      "x": 8880,
+      "y": 3808,
+      "width": 440,
+      "height": 510,
+      "text": "## Crear Conversación1\n`HTTP Request`\n\nCrea la conversación con el contacto recién creado.\n\n**Lee:** `Variables del menú.url_chatwoot`, `Variables del menú.api_chatwoot`, `Variables del menú.inbox_id`, `(entrada).payload.contact.identifier`, `(entrada).payload.contact.id`\n\n**Maneja / produce:**\n- POST {url_chatwoot}/api/v1/accounts/1/conversations\n- Body: source_id, inbox_id, contact_id\n- Headers: api_access_token, Content-Type\n\n⚠️ **Observación:**\n- Credencial escrita en el nodo.\n",
+      "color": "5"
+    },
+    {
+      "id": "a7be6f876c651f2e",
+      "type": "text",
+      "x": 8880,
+      "y": 4408,
+      "width": 440,
+      "height": 558,
+      "text": "## Guardar estado habeas\n`MySQL`\n\nUPDATE: `paso = 4` (espera respuesta del habeas).\n\n**Lee:** `Variables del menú.id_conversacion`, `Variables del menú.session`, `Webhook entrada.body.remitente_id`, `Webhook entrada.body.texto`, `Variables del menú.tipo`, `Variables del menú.inbox_id`\n\n**Maneja / produce:**\n- Operación: UPDATE sobre `estado_2031509`\n- Escribe: paso, fecha_modificacion, id_conversacion, num_advertencia, num_errores, session_wpp, payload, ori_fields\n\n⚠️ **Observación:**\n- Lee `Variables del menú.session`, que ese nodo no define (define `session_wp`).\n",
+      "color": "6"
+    },
+    {
+      "id": "a32eb0648d9bd1cc",
+      "type": "text",
+      "x": 8880,
+      "y": 5056,
+      "width": 440,
+      "height": 558,
+      "text": "## Guardar estado habeas2\n`MySQL`\n\nUPDATE: `paso = 6` (espera celular) y agrega la respuesta a `ori_fields`.\n\n**Lee:** `Variables del menú.id_conversacion`, `Variables del menú.session`, `Webhook entrada.body.remitente_id`, `Webhook entrada.body.texto`, `Variables del menú.tipo`, `Variables del menú.inbox_id`\n\n**Maneja / produce:**\n- Operación: UPDATE sobre `estado_2031509`\n- Escribe: paso, fecha_modificacion, id_conversacion, num_advertencia, num_errores, session_wpp, payload, ori_fields\n\n⚠️ **Observación:**\n- Lee `Variables del menú.session`, que ese nodo no define (define `session_wp`).\n",
+      "color": "6"
+    },
+    {
+      "id": "867067a5fcabab5b",
+      "type": "text",
+      "x": 8880,
+      "y": 5704,
+      "width": 440,
+      "height": 318,
+      "text": "## HTTP Request6\n`HTTP Request`\n\nEnvía por WhatsApp el menú de categorías.\n\n**Lee:** `Variables del menú.toJsonString`\n\n**Maneja / produce:**\n- POST https://n8n-general.interactivo.com.co/webhook/envio-whatsapp-todo-claro\n- Body: variable, tipo_mensaje, mensaje\n",
+      "color": "5"
+    },
+    {
+      "id": "c971be2d32393c39",
+      "type": "text",
+      "x": 8880,
+      "y": 6112,
+      "width": 440,
+      "height": 318,
+      "text": "## HTTP Request10\n`HTTP Request`\n\nEnvía por WhatsApp el mensaje de rechazo.\n\n**Lee:** `Variables del menú.toJsonString`\n\n**Maneja / produce:**\n- POST https://n8n-general.interactivo.com.co/webhook/envio-whatsapp-todo-claro\n- Body: variable, tipo_mensaje, mensaje\n",
+      "color": "5"
+    },
+    {
+      "id": "f4e9f7b257cf5481",
+      "type": "text",
+      "x": 9620,
+      "y": 2230,
+      "width": 440,
+      "height": 342,
+      "text": "## HTTP Request2\n`HTTP Request`\n\nPide token a la plataforma E2E/CTI (`/E2E/gettoken`). Usuario y clave están escritos en el nodo.\n\n**Maneja / produce:**\n- POST https://e2ecti.interactivo.com.co/E2E/gettoken\n\n⚠️ **Observación:**\n- Credencial escrita en el nodo.\n",
+      "color": "5"
+    },
+    {
+      "id": "e11e54fc84d1b4ee",
+      "type": "text",
+      "x": 9620,
+      "y": 3520,
+      "width": 440,
+      "height": 510,
+      "text": "## Enviar Mensaje Chatwoot Cliente\n`HTTP Request`\n\nRegistra el primer mensaje del cliente como entrante en la conversación recién creada.\n\n**Lee:** `Variables del menú.url_chatwoot`, `Crear Conversación.id`, `Crear Conversación1.id`, `Variables del menú.api_chatwoot`, `Webhook entrada.body.texto`\n\n**Maneja / produce:**\n- POST {url_chatwoot}/api/v1/accounts/1/conversations/{id}/messages\n- Body: content, message_type\n- Headers: api_access_token, Content-Type\n\n⚠️ **Observación:**\n- Credencial escrita en el nodo.\n",
+      "color": "5"
+    },
+    {
+      "id": "1599dc758169f1e9",
+      "type": "text",
+      "x": 9620,
+      "y": 5584,
+      "width": 440,
+      "height": 558,
+      "text": "## Guardar estado menú principal\n`MySQL`\n\nUPDATE: `paso = -1` (traspaso a asesor) con trazabilidad en `ori_fields`.\n\n**Lee:** `Variables del menú.id_conversacion`, `Variables del menú.session`, `Webhook entrada.body.remitente_id`, `Webhook entrada.body.texto`, `Variables del menú.tipo`, `Variables del menú.inbox_id`\n\n**Maneja / produce:**\n- Operación: UPDATE sobre `estado_2031509`\n- Escribe: paso, fecha_modificacion, id_conversacion, num_advertencia, num_errores, session_wpp, payload, ori_fields\n\n⚠️ **Observación:**\n- Lee `Variables del menú.session`, que ese nodo no define (define `session_wp`).\n",
+      "color": "6"
+    },
+    {
+      "id": "21cad2ffad1daa56",
+      "type": "text",
+      "x": 9620,
+      "y": 6232,
+      "width": 440,
+      "height": 534,
+      "text": "## Guardar estado rechazo\n`MySQL`\n\nUPDATE: `paso = 1000` (conversación cerrada).\n\n**Lee:** `Variables del menú.id_conversacion`, `Variables del menú.session`, `Webhook entrada.body.remitente_id`, `Webhook entrada.body.texto`, `Variables del menú.tipo`, `Variables del menú.inbox_id`\n\n**Maneja / produce:**\n- Operación: UPDATE sobre `estado_2031509`\n- Escribe: paso, fecha_modificacion, id_conversacion, num_advertencia, num_errores, session_wpp, payload, ori_fields\n\n⚠️ **Observación:**\n- Lee `Variables del menú.session`, que ese nodo no define (define `session_wp`).\n",
+      "color": "6"
+    },
+    {
+      "id": "6ccdd1fe32e078ee",
+      "type": "text",
+      "x": 10360,
+      "y": 2038,
+      "width": 440,
+      "height": 726,
+      "text": "## HTTP Request1\n`HTTP Request`\n\nInserta el lead (`insertLeadPhone`) en la CTI: teléfono (sin 57), campaña 209, GoContact, fechas con 1 hora menos.\n\n**Lee:** `Variables del menú.id_conversacion`, `Webhook entrada.body.texto.replace`, `(entrada).token`\n\n**Maneja / produce:**\n- POST https://e2ecti.interactivo.com.co//E2E/insertLeadPhone\n- Body: idLeadProvider, provider, firstName, lastName, phone, phone2, phone3, phone4, canal, gender, birthdate, address, age, url, legalText, optin, cpl, c2cDate, leadDate, expirationDate, internationalDP, leadExclusivity, verticality, typeLead, utmCampaign, utmSource, utmMedium, cti, campaignId, providerService, category, priority, agentId, CustomData1, CustomData2, CustomData3, CustomData4, CustomData5, CustomData6, CustomData7, CustomData8, CustomData9, CustomData10, CustomData11, CustomData12, CustomData13, CustomData14, CustomData15, CustomData16, CustomData17, CustomData18, CustomData19, CustomData20\n- Headers: marktel-access-token\n",
+      "color": "5"
+    },
+    {
+      "id": "ad28cc7ac8ea7bb9",
+      "type": "text",
+      "x": 10360,
+      "y": 3664,
+      "width": 440,
+      "height": 222,
+      "text": "## obtener label3\n`Set (variables)`\n\nDefine la etiqueta inicial `claro-terminales`.\n\n**Maneja / produce:**\n- label = claro-terminales\n",
+      "color": "2"
+    },
+    {
+      "id": "924706fdade685ac",
+      "type": "text",
+      "x": 10360,
+      "y": 5692,
+      "width": 440,
+      "height": 342,
+      "text": "## obtener label\n`Set (variables)`\n\nDefine la etiqueta del traspaso: la original de la BD + `agente_terminales`.\n\n**Lee:** `Variables del menú.etiqueta_chatwoot`\n\n**Maneja / produce:**\n- label_original = {{ $('Variables del menú').item.json.etiqueta_chatwoot }}\n- label1 = agente_terminales\n",
+      "color": "2"
+    },
+    {
+      "id": "733a41f21b57b906",
+      "type": "text",
+      "x": 11100,
+      "y": 3520,
+      "width": 440,
+      "height": 510,
+      "text": "## Asignar a asesor3\n`HTTP Request`\n\nAplica la etiqueta a la conversación (reemplaza las etiquetas existentes).\n\n**Lee:** `Variables del menú.url_chatwoot`, `Crear Conversación.id`, `Crear Conversación1.id`, `Variables del menú.api_chatwoot`, `(entrada).label`\n\n**Maneja / produce:**\n- POST {url_chatwoot}/api/v1/accounts/1/conversations/{id}/labels\n- Body: labels\n- Headers: Content-Type, api_access_token\n\n⚠️ **Observación:**\n- Credencial escrita en el nodo.\n",
+      "color": "5"
+    },
+    {
+      "id": "85dc119331d4e264",
+      "type": "text",
+      "x": 11100,
+      "y": 5620,
+      "width": 440,
+      "height": 486,
+      "text": "## Asignar a asesor\n`HTTP Request`\n\nAplica las dos etiquetas a la conversación.\n\n**Lee:** `Variables del menú.url_chatwoot`, `Variables del menú.id_conversacion`, `Variables del menú.api_chatwoot`, `(entrada).label_original`, `(entrada).label1`\n\n**Maneja / produce:**\n- POST {url_chatwoot}/api/v1/accounts/1/conversations/{id_conversacion}/labels\n- Body: labels\n- Headers: Content-Type, api_access_token\n\n⚠️ **Observación:**\n- Credencial escrita en el nodo.\n",
+      "color": "5"
+    },
+    {
+      "id": "500d8a577d00df4c",
+      "type": "text",
+      "x": 11840,
+      "y": 3544,
+      "width": 440,
+      "height": 462,
+      "text": "## HTTP Request\n`HTTP Request`\n\nConsulta los miembros del inbox en Chatwoot (resultado no usado después).\n\n**Lee:** `Variables del menú.url_chatwoot`, `Variables del menú.inbox_id`, `Variables del menú.api_chatwoot`\n\n**Maneja / produce:**\n- GET {url_chatwoot}/api/v1/accounts/1/inbox_members/{inbox_id}\n- Headers: Content-Type, api_access_token\n\n⚠️ **Observación:**\n- Credencial escrita en el nodo.\n",
+      "color": "5"
+    },
+    {
+      "id": "30fb70dd812c145e",
+      "type": "text",
+      "x": 11840,
+      "y": 5644,
+      "width": 440,
+      "height": 438,
+      "text": "## HTTP Request3\n`HTTP Request`\n\nLista los miembros del inbox 11 en Chatwoot.\n\n**Lee:** `Variables del menú.url_chatwoot`, `Variables del menú.id_cuenta`, `Variables del menú.inbox_id`, `Variables del menú.api_chatwoot`\n\n**Maneja / produce:**\n- GET {url_chatwoot}/api/v1/accounts/{id_cuenta}/inbox_members/{inbox_id}\n- Headers: Content-Type, api_access_token\n\n⚠️ **Observación:**\n- Credencial escrita en el nodo.\n",
+      "color": "5"
+    },
+    {
+      "id": "403b76de8720676f",
+      "type": "text",
+      "x": 12580,
+      "y": 3664,
+      "width": 440,
+      "height": 222,
+      "text": "## Wait1\n`Wait`\n\nEspera 4 s antes de responder.\n\n**Maneja / produce:**\n- Espera 4 s\n",
+      "color": "2"
+    },
+    {
+      "id": "fcd3524b502616c7",
+      "type": "text",
+      "x": 12580,
+      "y": 5740,
+      "width": 440,
+      "height": 246,
+      "text": "## Code\n`Code (JS)`\n\nFiltra los agentes con `availability_status = online`.\n\n**Maneja / produce:**\n- Devuelve: agentsFound, availableAgents\n",
+      "color": "2"
+    },
+    {
+      "id": "70c63ff09a753bab",
+      "type": "text",
+      "x": 13320,
+      "y": 3532,
+      "width": 440,
+      "height": 486,
+      "text": "## Enviar Mensaje Chatwoot Agente\n`HTTP Request`\n\nPublica en Chatwoot el saludo de la oferta (opción 1 llamada, 2 WhatsApp) como saliente.\n\n**Lee:** `Variables del menú.url_chatwoot`, `Crear Conversación.id`, `Crear Conversación1.id`, `Variables del menú.api_chatwoot`\n\n**Maneja / produce:**\n- POST {url_chatwoot}/api/v1/accounts/1/conversations/{id}/messages\n- Body: content, message_type\n- Headers: api_access_token, Content-Type, \n\n⚠️ **Observación:**\n- Credencial escrita en el nodo.\n",
+      "color": "5"
+    },
+    {
+      "id": "80fc3bd799e445b2",
+      "type": "text",
+      "x": 13320,
+      "y": 5716,
+      "width": 440,
+      "height": 294,
+      "text": "## Agentes en linea\n`IF`\n\nSi hay al menos un agente online continúa; si no, el flujo termina sin asignar.\n\n**Lee:** `(entrada).agentsFound`\n\n**Maneja / produce:**\n- $json.agentsFound\n",
+      "color": "3"
+    },
+    {
+      "id": "cbedfff937322a94",
+      "type": "text",
+      "x": 14060,
+      "y": 3604,
+      "width": 440,
+      "height": 342,
+      "text": "## HTTP Request4\n`HTTP Request`\n\nEnvía por WhatsApp el saludo de la oferta usando el webhook de envío (`tipo_mensaje: texto`).\n\n**Lee:** `Variables del menú.toJsonString`\n\n**Maneja / produce:**\n- POST https://n8n-general.interactivo.com.co/webhook/envio-whatsapp-todo-claro\n- Body: variable, tipo_mensaje, mensaje\n",
+      "color": "5"
+    },
+    {
+      "id": "7ba200c7e81ed5d4",
+      "type": "text",
+      "x": 14060,
+      "y": 5608,
+      "width": 440,
+      "height": 510,
+      "text": "## Obtener conversaciones totales1\n`HTTP Request`\n\nTrae las conversaciones abiertas asignadas del inbox con etiqueta `asignado-asesor`.\n\n**Lee:** `Variables del menú.url_chatwoot`, `Variables del menú.id_cuenta`, `Variables del menú.inbox_id`, `Variables del menú.api_chatwoot`\n\n**Maneja / produce:**\n- GET {url_chatwoot}/api/v1/accounts/{id_cuenta}/conversations?assignee_type=assigned&status=open&inbox_id={inbox_id}&labels[]=asignado-asesor&page=1\n- Headers: Content-Type, api_access_token\n\n⚠️ **Observación:**\n- Credencial escrita en el nodo.\n",
+      "color": "5"
+    },
+    {
+      "id": "d0f4deff69d3ff80",
+      "type": "text",
+      "x": 14800,
+      "y": 3520,
+      "width": 440,
+      "height": 510,
+      "text": "## Guardar estado menú principal1\n`MySQL`\n\nINSERT/UPSERT en `estado_2031509`: `paso = 2`, conversación nueva, etiqueta, sesión, payload y `ori_fields` con la primera respuesta.\n\n**Lee:** `Webhook entrada.body.remitente_id`, `Variables del menú.tipo`, `Variables del menú.inbox_id`, `Crear Conversación.id`, `Crear Conversación1.id`, `Variables globales.session`, `Webhook entrada.body.texto` …(+2)\n\n**Maneja / produce:**\n- Operación: INSERT sobre `estado_2031509`\n- Escribe: cliente,paso,tipo,id_cuenta,id_inbox,id_conversacion,num_advertencia,num_errores,fecha_modificacion,session_wpp,payload,ori_fields,etiqueta_chatwoot\n",
+      "color": "6"
+    },
+    {
+      "id": "a64de427bf7a330f",
+      "type": "text",
+      "x": 14800,
+      "y": 5716,
+      "width": 440,
+      "height": 294,
+      "text": "## Code1\n`Code (JS)`\n\nElige el agente online con menos conversaciones asignadas.\n\n**Lee:** `Code.availableAgents`\n\n**Maneja / produce:**\n- Devuelve: agentId\n",
+      "color": "2"
+    },
+    {
+      "id": "312a1a094e537392",
+      "type": "text",
+      "x": 15540,
+      "y": 5620,
+      "width": 440,
+      "height": 486,
+      "text": "## Asignar agente1\n`HTTP Request`\n\nAsigna la conversación al agente elegido.\n\n**Lee:** `Variables del menú.url_chatwoot`, `Variables del menú.id_cuenta`, `Variables del menú.id_conversacion`, `Variables del menú.api_chatwoot`, `(entrada).agentId`\n\n**Maneja / produce:**\n- POST {url_chatwoot}/api/v1/accounts/{id_cuenta}/conversations/{id_conversacion}/assignments\n- Body: assignee_id\n- Headers: Content-Type, api_access_token\n\n⚠️ **Observación:**\n- Credencial escrita en el nodo.\n",
+      "color": "5"
+    },
+    {
+      "id": "9e36a469047bcd61",
+      "type": "text",
+      "x": 0,
+      "y": 6966,
+      "width": 900,
+      "height": 160,
+      "text": "# Nodos huérfanos (8)\n\nSin conexión desde el webhook: restos de la versión Evolution. No se ejecutan.",
+      "color": "1"
+    },
+    {
+      "id": "83114098a59ab1df",
+      "type": "text",
+      "x": 0,
+      "y": 7206,
+      "width": 440,
+      "height": 222,
+      "text": "## Convert to File\n`convertToFile`\n\n**Huérfano.** Convierte base64 a binario; parte de la ruta antigua de imágenes.\n\n**Lee:** `Variables imagen.mimetype`\n",
+      "color": "1"
+    },
+    {
+      "id": "0da0f7d19d8adcea",
+      "type": "text",
+      "x": 560,
+      "y": 7206,
+      "width": 440,
+      "height": 678,
+      "text": "## Variables imagen\n`Set (variables)`\n\n**Huérfano.** Prepara base64/mimetype de la ruta antigua de Evolution; ningún nodo lo alimenta.\n\n**Lee:** `Obtener estado imagen.id_conversacion`, `Obtener Base64 Imagen.base64`, `Obtener Base64 Imagen.mimetype`, `Obtener Base64 Imagen.caption`\n\n**Maneja / produce:**\n- id_conversacion = {{ $('Obtener estado imagen').item.json.id_conversacion }}\n- base64 = {{ $('Obtener Base64 Imagen').item.json.base64 }}\n- mimetype = {{ $('Obtener Base64 Imagen').item.json.mimetype }}\n- caption = {{ $('Obtener Base64 Imagen').item.json.caption ? $('Obtener Base64 Im\n- api_chatwoot = <clave oculta>\n- url_chatwoot = https://botconnect.interactivo.com.co:8443\n\n⚠️ **Observación:**\n- Credencial escrita en el nodo.\n",
+      "color": "1"
+    },
+    {
+      "id": "d75378ec714f57f1",
+      "type": "text",
+      "x": 1120,
+      "y": 7206,
+      "width": 440,
+      "height": 558,
+      "text": "## Obtener Base64 Imagen\n`HTTP Request`\n\n**Huérfano.** Pedía el archivo a Evolution (`getBase64FromMediaMessage`); sin conexiones.\n\n**Lee:** `Webhook entrada.body.data.key.id`\n\n**Maneja / produce:**\n- POST https://evolution-general.interactivo.com.co/chat/getBase64FromMediaMessage/AGENTE_WHATSAPP_TODO_CLARO_7\n- Body: message, key, id, convertToMp4\n- Headers: apikey\n\n⚠️ **Observación:**\n- Resto de Evolution (llamada directa a Evolution).\n- Lee la ruta del formato Evolution (`body.data.key…`) aunque el cuerpo ya viene normalizado.\n- Credencial escrita en el nodo.\n",
+      "color": "1"
+    },
+    {
+      "id": "e2ebdf312aef43c1",
+      "type": "text",
+      "x": 0,
+      "y": 7974,
+      "width": 440,
+      "height": 582,
+      "text": "## HTTP Request9\n`HTTP Request`\n\n**Huérfano.** `sendText` directo a Evolution (menú de categorías). Sin conexiones.\n\n**Lee:** `Variables del menú.url_evolution`, `Variables globales.session`, `Variables del menú.api_evolution`, `Webhook entrada.body.data.key.remoteJid.split`\n\n**Maneja / produce:**\n- POST {url_evolution}/message/sendText/{session}\n- Body: number, text\n- Headers: apikey\n\n⚠️ **Observación:**\n- Resto de Evolution (llamada directa a Evolution).\n- Lee la ruta del formato Evolution (`body.data.key…`) aunque el cuerpo ya viene normalizado.\n",
+      "color": "1"
+    },
+    {
+      "id": "e9d35e4bea429671",
+      "type": "text",
+      "x": 560,
+      "y": 7974,
+      "width": 440,
+      "height": 582,
+      "text": "## HTTP Request8\n`HTTP Request`\n\n**Huérfano.** `sendText` directo a Evolution (solicitud registrada). Sin conexiones.\n\n**Lee:** `Variables del menú.url_evolution`, `Variables globales.session`, `Variables del menú.api_evolution`, `Webhook entrada.body.data.key.remoteJid.split`\n\n**Maneja / produce:**\n- POST {url_evolution}/message/sendText/{session}\n- Body: number, text\n- Headers: apikey\n\n⚠️ **Observación:**\n- Resto de Evolution (llamada directa a Evolution).\n- Lee la ruta del formato Evolution (`body.data.key…`) aunque el cuerpo ya viene normalizado.\n",
+      "color": "1"
+    },
+    {
+      "id": "8f06bdb77f20d128",
+      "type": "text",
+      "x": 1120,
+      "y": 7974,
+      "width": 440,
+      "height": 582,
+      "text": "## Habeas WhatsApp\n`HTTP Request`\n\n**Huérfano.** `sendText` directo a Evolution (habeas). Sin conexiones.\n\n**Lee:** `Variables del menú.url_evolution`, `Variables globales.session`, `Variables del menú.api_evolution`, `Webhook entrada.body.data.key.remoteJid.split`\n\n**Maneja / produce:**\n- POST {url_evolution}/message/sendText/{session}\n- Body: number, text\n- Headers: apikey\n\n⚠️ **Observación:**\n- Resto de Evolution (llamada directa a Evolution).\n- Lee la ruta del formato Evolution (`body.data.key…`) aunque el cuerpo ya viene normalizado.\n",
+      "color": "1"
+    },
+    {
+      "id": "d130a1d2332f218e",
+      "type": "text",
+      "x": 0,
+      "y": 8646,
+      "width": 440,
+      "height": 582,
+      "text": "## Rechazo WhatsApp\n`HTTP Request`\n\n**Huérfano.** `sendText` directo a Evolution (rechazo). Sin conexiones.\n\n**Lee:** `Variables del menú.url_evolution`, `Variables globales.session`, `Variables del menú.api_evolution`, `Webhook entrada.body.data.key.remoteJid.split`\n\n**Maneja / produce:**\n- POST {url_evolution}/message/sendText/{session}\n- Body: number, text\n- Headers: apikey\n\n⚠️ **Observación:**\n- Resto de Evolution (llamada directa a Evolution).\n- Lee la ruta del formato Evolution (`body.data.key…`) aunque el cuerpo ya viene normalizado.\n",
+      "color": "1"
+    },
+    {
+      "id": "2924ae8f00ba4cc7",
+      "type": "text",
+      "x": 560,
+      "y": 8646,
+      "width": 440,
+      "height": 582,
+      "text": "## HTTP Request7\n`HTTP Request`\n\n**Huérfano.** `sendText` directo a Evolution (saludo LEO). Sin conexiones.\n\n**Lee:** `Variables del menú.url_evolution`, `Variables globales.session`, `Variables del menú.api_evolution`, `Webhook entrada.body.data.key.remoteJid`\n\n**Maneja / produce:**\n- POST {url_evolution}/message/sendText/{session}\n- Body: number, text\n- Headers: apikey\n\n⚠️ **Observación:**\n- Resto de Evolution (llamada directa a Evolution).\n- Lee la ruta del formato Evolution (`body.data.key…`) aunque el cuerpo ya viene normalizado.\n",
+      "color": "1"
+    }
+  ],
+  "edges": [
+    {
+      "id": "8042d8634f193ee8",
+      "fromNode": "0da0f7d19d8adcea",
+      "fromSide": "right",
+      "toNode": "83114098a59ab1df",
+      "toSide": "left",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "f61a6c15bf26da50",
+      "fromNode": "b71735d88f56e3b7",
+      "fromSide": "right",
+      "toNode": "a7d9b9b1f98c627c",
+      "toSide": "left",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "f97d633c2d78ad87",
+      "fromNode": "c0f2d7c6ef37dfe9",
+      "fromSide": "right",
+      "toNode": "c16aff1e500b3d39",
+      "toSide": "left",
+      "toEnd": "arrow",
+      "label": "sí"
+    },
+    {
+      "id": "18e9e436ad01afaa",
+      "fromNode": "c0f2d7c6ef37dfe9",
+      "fromSide": "right",
+      "toNode": "c8e1cc84d1349fee",
+      "toSide": "left",
+      "toEnd": "arrow",
+      "label": "no"
+    },
+    {
+      "id": "2faa823fde96338b",
+      "fromNode": "b6cad43f6ad349c3",
+      "fromSide": "right",
+      "toNode": "fe61f72bf633448a",
+      "toSide": "left",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "0a9b6d3a93257815",
+      "fromNode": "705b9ebf869f26fe",
+      "fromSide": "right",
+      "toNode": "8b0d037f6afbc34b",
+      "toSide": "left",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "a3513d71f3713b8c",
+      "fromNode": "55ad599b7754c7e0",
+      "fromSide": "right",
+      "toNode": "b6cad43f6ad349c3",
+      "toSide": "left",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "3acb2cd1a2cd6396",
+      "fromNode": "8b0d037f6afbc34b",
+      "fromSide": "right",
+      "toNode": "55ad599b7754c7e0",
+      "toSide": "left",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "616110fe7bf121c9",
+      "fromNode": "4dc2a1055c1c4810",
+      "fromSide": "right",
+      "toNode": "c0f2d7c6ef37dfe9",
+      "toSide": "left",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "842f88cd9b198c10",
+      "fromNode": "63a83ade4437e4f6",
+      "fromSide": "right",
+      "toNode": "4c5000841a040c77",
+      "toSide": "left",
+      "toEnd": "arrow",
+      "label": "sí"
+    },
+    {
+      "id": "60ef911429ac22ba",
+      "fromNode": "9adcb2b17ddd86e1",
+      "fromSide": "right",
+      "toNode": "867067a5fcabab5b",
+      "toSide": "left",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "0a660467967bbc64",
+      "fromNode": "1599dc758169f1e9",
+      "fromSide": "right",
+      "toNode": "924706fdade685ac",
+      "toSide": "left",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "28f8296ac6287f37",
+      "fromNode": "30fb70dd812c145e",
+      "fromSide": "right",
+      "toNode": "fcd3524b502616c7",
+      "toSide": "left",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "a00e2331be8274d3",
+      "fromNode": "7ba200c7e81ed5d4",
+      "fromSide": "right",
+      "toNode": "a64de427bf7a330f",
+      "toSide": "left",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "aa1e418db12f2ae3",
+      "fromNode": "924706fdade685ac",
+      "fromSide": "right",
+      "toNode": "85dc119331d4e264",
+      "toSide": "left",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "69892b46bab106a9",
+      "fromNode": "85dc119331d4e264",
+      "fromSide": "right",
+      "toNode": "30fb70dd812c145e",
+      "toSide": "left",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "6596d2270dabd0c8",
+      "fromNode": "a64de427bf7a330f",
+      "fromSide": "right",
+      "toNode": "312a1a094e537392",
+      "toSide": "left",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "c66061a29e3c1aed",
+      "fromNode": "80fc3bd799e445b2",
+      "fromSide": "right",
+      "toNode": "7ba200c7e81ed5d4",
+      "toSide": "left",
+      "toEnd": "arrow",
+      "label": "sí"
+    },
+    {
+      "id": "0cc07b8a1f016ca0",
+      "fromNode": "fcd3524b502616c7",
+      "fromSide": "right",
+      "toNode": "80fc3bd799e445b2",
+      "toSide": "left",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "659401bfbefaeed6",
+      "fromNode": "af77dd2a6dd5a560",
+      "fromSide": "right",
+      "toNode": "c1dc523a224f2c54",
+      "toSide": "left",
+      "toEnd": "arrow",
+      "label": "1"
+    },
+    {
+      "id": "90e435a670f33fd3",
+      "fromNode": "af77dd2a6dd5a560",
+      "fromSide": "right",
+      "toNode": "22d65df013a48067",
+      "toSide": "left",
+      "toEnd": "arrow",
+      "label": "2"
+    },
+    {
+      "id": "3fcf26f998d45f13",
+      "fromNode": "af77dd2a6dd5a560",
+      "fromSide": "right",
+      "toNode": "c8e1cc84d1349fee",
+      "toSide": "left",
+      "toEnd": "arrow",
+      "label": "otro"
+    },
+    {
+      "id": "fa90633fcc8fcbdf",
+      "fromNode": "f4e9f7b257cf5481",
+      "fromSide": "right",
+      "toNode": "6ccdd1fe32e078ee",
+      "toSide": "left",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "9ec7ae7fa34aedc1",
+      "fromNode": "0c06ab0237ed69c4",
+      "fromSide": "right",
+      "toNode": "e11e54fc84d1b4ee",
+      "toSide": "left",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "4f2472e337c2af7d",
+      "fromNode": "c28d3cde8241f6d4",
+      "fromSide": "right",
+      "toNode": "e11e54fc84d1b4ee",
+      "toSide": "left",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "f9c4fc63f556d3f1",
+      "fromNode": "1c03c42d099e880b",
+      "fromSide": "right",
+      "toNode": "2c7ab55c88ac0a2e",
+      "toSide": "left",
+      "toEnd": "arrow",
+      "label": "sí"
+    },
+    {
+      "id": "4924397d15a23ef5",
+      "fromNode": "1c03c42d099e880b",
+      "fromSide": "right",
+      "toNode": "d1771e1421fb159b",
+      "toSide": "left",
+      "toEnd": "arrow",
+      "label": "no"
+    },
+    {
+      "id": "5243b7608f599721",
+      "fromNode": "1e468797c24311d2",
+      "fromSide": "right",
+      "toNode": "3393aabdb49fc24b",
+      "toSide": "left",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "069f111019cd10cf",
+      "fromNode": "2c7ab55c88ac0a2e",
+      "fromSide": "right",
+      "toNode": "0c06ab0237ed69c4",
+      "toSide": "left",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "b9ed26a539dae2a5",
+      "fromNode": "d1771e1421fb159b",
+      "fromSide": "right",
+      "toNode": "c28d3cde8241f6d4",
+      "toSide": "left",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "5ac148555ddde275",
+      "fromNode": "08d2406f5c35f753",
+      "fromSide": "right",
+      "toNode": "af77dd2a6dd5a560",
+      "toSide": "left",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "fbf58d828377e49f",
+      "fromNode": "4c5000841a040c77",
+      "fromSide": "right",
+      "toNode": "705b9ebf869f26fe",
+      "toSide": "left",
+      "toEnd": "arrow",
+      "label": "location"
+    },
+    {
+      "id": "9843f49bf643d5e9",
+      "fromNode": "4c5000841a040c77",
+      "fromSide": "right",
+      "toNode": "7fd026922c4dcb92",
+      "toSide": "left",
+      "toEnd": "arrow",
+      "label": "Texto"
+    },
+    {
+      "id": "918253408d53be53",
+      "fromNode": "4c5000841a040c77",
+      "fromSide": "right",
+      "toNode": "b71735d88f56e3b7",
+      "toSide": "left",
+      "toEnd": "arrow",
+      "label": "media"
+    },
+    {
+      "id": "557b3a0e41e00f4c",
+      "fromNode": "e11e54fc84d1b4ee",
+      "fromSide": "right",
+      "toNode": "ad28cc7ac8ea7bb9",
+      "toSide": "left",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "a4f75c9173e6cba0",
+      "fromNode": "733a41f21b57b906",
+      "fromSide": "right",
+      "toNode": "500d8a577d00df4c",
+      "toSide": "left",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "be3ad377f1041644",
+      "fromNode": "ad28cc7ac8ea7bb9",
+      "fromSide": "right",
+      "toNode": "733a41f21b57b906",
+      "toSide": "left",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "e99557aaa08b4096",
+      "fromNode": "6ebf0d6f55ad8b5a",
+      "fromSide": "right",
+      "toNode": "f4e9f7b257cf5481",
+      "toSide": "left",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "5a33850bd677d599",
+      "fromNode": "c16aff1e500b3d39",
+      "fromSide": "right",
+      "toNode": "b014b5f2cae39040",
+      "toSide": "left",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "811484d461ee5bbb",
+      "fromNode": "500d8a577d00df4c",
+      "fromSide": "right",
+      "toNode": "403b76de8720676f",
+      "toSide": "left",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "3b8c53499618da1a",
+      "fromNode": "22d65df013a48067",
+      "fromSide": "right",
+      "toNode": "9d05905ffdb599e5",
+      "toSide": "left",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "36a79d96d81f1bac",
+      "fromNode": "4c3f3d139e558229",
+      "fromSide": "right",
+      "toNode": "dd5344a6a760ad3d",
+      "toSide": "left",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "313ec04ac25da96f",
+      "fromNode": "dd5344a6a760ad3d",
+      "fromSide": "right",
+      "toNode": "edab6c085eb80644",
+      "toSide": "left",
+      "toEnd": "arrow",
+      "label": "sí"
+    },
+    {
+      "id": "73d11b49ceeb79d6",
+      "fromNode": "dd5344a6a760ad3d",
+      "fromSide": "right",
+      "toNode": "c8e1cc84d1349fee",
+      "toSide": "left",
+      "toEnd": "arrow",
+      "label": "no"
+    },
+    {
+      "id": "515e8b08e43521cc",
+      "fromNode": "edab6c085eb80644",
+      "fromSide": "right",
+      "toNode": "9adcb2b17ddd86e1",
+      "toSide": "left",
+      "toEnd": "arrow",
+      "label": "sí"
+    },
+    {
+      "id": "7b54ba58e485f2f7",
+      "fromNode": "edab6c085eb80644",
+      "fromSide": "right",
+      "toNode": "dd8e4e0eafad40a4",
+      "toSide": "left",
+      "toEnd": "arrow",
+      "label": "no"
+    },
+    {
+      "id": "d5d1dd7d32493dc5",
+      "fromNode": "dd8e4e0eafad40a4",
+      "fromSide": "right",
+      "toNode": "c971be2d32393c39",
+      "toSide": "left",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "835aa23848d18ffa",
+      "fromNode": "04ae8ced9d36ab3a",
+      "fromSide": "right",
+      "toNode": "1e468797c24311d2",
+      "toSide": "left",
+      "toEnd": "arrow",
+      "label": "undefined"
+    },
+    {
+      "id": "aa69d26c39df9eee",
+      "fromNode": "04ae8ced9d36ab3a",
+      "fromSide": "right",
+      "toNode": "1e468797c24311d2",
+      "toSide": "left",
+      "toEnd": "arrow",
+      "label": "0"
+    },
+    {
+      "id": "7ba5eec1059b2d69",
+      "fromNode": "04ae8ced9d36ab3a",
+      "fromSide": "right",
+      "toNode": "1e468797c24311d2",
+      "toSide": "left",
+      "toEnd": "arrow",
+      "label": "1000"
+    },
+    {
+      "id": "cac1181e5ca55486",
+      "fromNode": "04ae8ced9d36ab3a",
+      "fromSide": "right",
+      "toNode": "1e468797c24311d2",
+      "toSide": "left",
+      "toEnd": "arrow",
+      "label": "1"
+    },
+    {
+      "id": "519ea05c8b5da0f1",
+      "fromNode": "04ae8ced9d36ab3a",
+      "fromSide": "right",
+      "toNode": "08d2406f5c35f753",
+      "toSide": "left",
+      "toEnd": "arrow",
+      "label": "2"
+    },
+    {
+      "id": "b4204181e98dcd80",
+      "fromNode": "04ae8ced9d36ab3a",
+      "fromSide": "right",
+      "toNode": "4dc2a1055c1c4810",
+      "toSide": "left",
+      "toEnd": "arrow",
+      "label": "-1"
+    },
+    {
+      "id": "6d387375697189a3",
+      "fromNode": "04ae8ced9d36ab3a",
+      "fromSide": "right",
+      "toNode": "1ebc2c07598320cd",
+      "toSide": "left",
+      "toEnd": "arrow",
+      "label": "3"
+    },
+    {
+      "id": "9ab66281bbb4de2d",
+      "fromNode": "04ae8ced9d36ab3a",
+      "fromSide": "right",
+      "toNode": "4c3f3d139e558229",
+      "toSide": "left",
+      "toEnd": "arrow",
+      "label": "4"
+    },
+    {
+      "id": "70ed79be66857d02",
+      "fromNode": "04ae8ced9d36ab3a",
+      "fromSide": "right",
+      "toNode": "c16aff1e500b3d39",
+      "toSide": "left",
+      "toEnd": "arrow",
+      "label": "6"
+    },
+    {
+      "id": "01fa2c18fe6fc88b",
+      "fromNode": "04ae8ced9d36ab3a",
+      "fromSide": "right",
+      "toNode": "e63e687f6f601476",
+      "toSide": "left",
+      "toEnd": "arrow",
+      "label": "otro"
+    },
+    {
+      "id": "52cf5ca51cafa25e",
+      "fromNode": "70c63ff09a753bab",
+      "fromSide": "right",
+      "toNode": "cbedfff937322a94",
+      "toSide": "left",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "71c62ae052ec2401",
+      "fromNode": "403b76de8720676f",
+      "fromSide": "right",
+      "toNode": "70c63ff09a753bab",
+      "toSide": "left",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "e553f6a94e8dbd43",
+      "fromNode": "d43b21afa70a2ea9",
+      "fromSide": "right",
+      "toNode": "04ae8ced9d36ab3a",
+      "toSide": "left",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "7fcde146cf7244ba",
+      "fromNode": "3393aabdb49fc24b",
+      "fromSide": "right",
+      "toNode": "1c03c42d099e880b",
+      "toSide": "left",
+      "toEnd": "arrow",
+      "label": "inbox11"
+    },
+    {
+      "id": "b94d2ceecffa41bd",
+      "fromNode": "a3569958ea59e8a6",
+      "fromSide": "right",
+      "toNode": "d43b21afa70a2ea9",
+      "toSide": "left",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "78b807e4ccb83aaf",
+      "fromNode": "7fd026922c4dcb92",
+      "fromSide": "right",
+      "toNode": "dfc5a5b0f2bd3cf8",
+      "toSide": "left",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "1992ad19208b8a83",
+      "fromNode": "dfc5a5b0f2bd3cf8",
+      "fromSide": "right",
+      "toNode": "a3569958ea59e8a6",
+      "toSide": "left",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "efbd6359a19cf67b",
+      "fromNode": "780f97091dd6a25c",
+      "fromSide": "right",
+      "toNode": "63a83ade4437e4f6",
+      "toSide": "left",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "666fb66cd231b2e7",
+      "fromNode": "cbedfff937322a94",
+      "fromSide": "right",
+      "toNode": "d0f4deff69d3ff80",
+      "toSide": "left",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "381b62b466e988b1",
+      "fromNode": "9d05905ffdb599e5",
+      "fromSide": "right",
+      "toNode": "a7be6f876c651f2e",
+      "toSide": "left",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "66313b0a9e6d480f",
+      "fromNode": "867067a5fcabab5b",
+      "fromSide": "right",
+      "toNode": "1599dc758169f1e9",
+      "toSide": "left",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "2a7a8ba4723663d3",
+      "fromNode": "c971be2d32393c39",
+      "fromSide": "right",
+      "toNode": "21cad2ffad1daa56",
+      "toSide": "left",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "90cc85674a3025a4",
+      "fromNode": "b014b5f2cae39040",
+      "fromSide": "right",
+      "toNode": "6ebf0d6f55ad8b5a",
+      "toSide": "left",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "5cdbfb9846da4ef5",
+      "fromNode": "c1dc523a224f2c54",
+      "fromSide": "right",
+      "toNode": "f14ab5e7098d80de",
+      "toSide": "left",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "520f0c67d637829b",
+      "fromNode": "f14ab5e7098d80de",
+      "fromSide": "right",
+      "toNode": "a32eb0648d9bd1cc",
+      "toSide": "left",
+      "toEnd": "arrow"
+    },
+    {
+      "id": "10fd16d40f73beec",
+      "fromNode": "a7d9b9b1f98c627c",
+      "fromSide": "right",
+      "toNode": "31f37ad571ed9d61",
+      "toSide": "left",
+      "toEnd": "arrow"
+    }
+  ]
+}

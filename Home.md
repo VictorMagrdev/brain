@@ -18,7 +18,7 @@ Soy desarrollador de software. Llevo varios proyectos pequeños en paralelo y qu
 - [Reglas operativas](Projects/Reglas-Operativas.md): lo que nunca se olvida (skill + rol Fichaje siempre)
 - [Checklist de usuarios GLPI](Projects/Checklist-Usuarios-GLPI.md)
 - [Módulo WhatsApp](Projects/Modulo-WhatsApp.md)
-- [Documentación de n8n (CLARO_MOVIL)](n8n/Documentacion%20de%20n8n.md) · [Guía de pruebas](n8n/Guia%20de%20pruebas%20CLARO_MOVIL.md)
+- [Documentación de n8n (CLARO_MOVIL)](n8n/Documentacion%20de%20n8n.md) · [Guía de pruebas](n8n/Guia%20de%20pruebas%20CLARO_MOVIL.md) · [Datos y equivalencias WAHA](n8n/Datos%20y%20equivalencias%20WAHA.md) · [Comparación TODO_CLARO vs CLARO_MOVIL](n8n/Comparacion%20TODO_CLARO%20vs%20CLARO_MOVIL.md)
 - [Contexto migración WAHA](Projects/Contexto-Migracion-WAHA-CLARO_MOVIL.md) · [Migración WAHA: CLARO_MOVIL](Projects/Migracion-WAHA-CLARO_MOVIL.md) · [Flujos n8n](Projects/CLARO_MOVIL-Flujos-n8n.md)
 - [Incidencia uContact](Projects/Incidencia-uContact.md)
 - [Migración de grabaciones](Projects/Migracion-Grabaciones.md)

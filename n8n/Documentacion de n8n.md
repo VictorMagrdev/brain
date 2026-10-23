@@ -8,6 +8,10 @@ Para probar la copia en n8n: [Guía de pruebas CLARO_MOVIL](Guia%20de%20pruebas%
 
 Revisión lógica (tablas de verdad, errores y optimizaciones): [Análisis lógico](Analisis%20logico%20CLARO_MOVIL.md).
 
+Datos recibidos, equivalencias y dónde tocar: [Datos y equivalencias WAHA](Datos%20y%20equivalencias%20WAHA.md).
+
+Flujo de referencia ya migrado: [TODO_CLARO Principal V 3.0](TODO_CLARO/Documentacion-TODO-CLARO-Principal.md) ([canvas](TODO_CLARO/TODO-CLARO-Principal.canvas)) y la [comparación con CLARO_MOVIL](Comparacion%20TODO_CLARO%20vs%20CLARO_MOVIL.md), que dice qué toca migrar.
+
 ## Los 5 flujos
 | # | Flujo | Disparador | Canvas | Documento | Nodos |
 |---|---|---|---|---|---|
@@ -126,7 +130,6 @@ Por validar con un payload real de WAHA: ruta exacta del teléfono (`from` puede
 
 ## Preguntas abiertas
 - ¿Qué ruta de entrada queda: `bot-claro-movil` o `recepcion-whatsapp-claro-movil`?
-- ¿`AGENTE_PRUEBA_1` es la sesión definitiva?
 - ¿Cuál es la URL real de Chatwoot: `botconnect…:8443` (flujos) o `chatwoot-general…` (Excel)?
 
 Volver a [Home](../Home.md)

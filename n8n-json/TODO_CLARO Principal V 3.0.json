@@ -1,0 +1,3117 @@
+{
+  "name": "TODO_CLARO Principal V 3.0",
+  "nodes": [
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Variables del menú').item.json.url_chatwoot }}/api/v1/accounts/1/conversations/{{ $('Variables del menú').item.json.id_conversacion }}/messages",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "api_access_token",
+              "value": "={{ $('Variables del menú').item.json.api_chatwoot }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"content\": \"{{ $('Webhook entrada').item.json.body.texto }}\",\n  \"message_type\": \"incoming\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -352,
+        1200
+      ],
+      "id": "04ad7f8b-98cd-4b6c-a6f0-2cec6334acfc",
+      "name": "Registrar mensaje asesor",
+      "retryOnFail": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "a1b2c3d4-0001-4000-8000-000000000001",
+              "leftValue": "={{ ['1','2','3','4','5'].includes(( $('Webhook entrada').item.json.body.texto || '').trim()) }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -336,
+        96
+      ],
+      "id": "0d32ef86-6827-4387-8fe6-259753dc4b7f",
+      "name": "Validar opción (1-5)"
+    },
+    {
+      "parameters": {
+        "operation": "toBinary",
+        "sourceProperty": "=base64",
+        "binaryPropertyName": "=imagen_binaria",
+        "options": {
+          "fileName": "=imagen.jpg",
+          "mimeType": "={{ $('Variables imagen').item.json.mimetype }}"
+        }
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        -1728,
+        -320
+      ],
+      "id": "e4719397-36a2-4181-85ed-6915f3b44cc3",
+      "name": "Convert to File"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://botconnect.interactivo.com.co:8443/api/v1/accounts/1/conversations/{{ $('Obtener estado imagen').item.json.id_conversacion }}/messages",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "api_access_token",
+              "value": "=NiH1YMSRCLSNeL2h2bHaTudD"
+            },
+            {
+              "name": "Content-Type",
+              "value": "multipart/form-data"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "attachments[]",
+              "inputDataFieldName": "data"
+            },
+            {
+              "name": "message_type",
+              "value": "incoming"
+            },
+            {
+              "name": "content",
+              "value": "=imagen"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1888,
+        -160
+      ],
+      "id": "0d46fbc0-9c35-47db-9b8b-f182a6398452",
+      "name": "Enviar Imagen Chatwoot"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"id_conversacion\": \"{{ $('Obtener estado imagen').item.json.id_conversacion }}\",\n  \"base64\": \"{{ $('Obtener Base64 Imagen').item.json.base64 }}\",\n  \"mimetype\": \"{{ $('Obtener Base64 Imagen').item.json.mimetype }}\",\n  \"caption\": \"{{ $('Obtener Base64 Imagen').item.json.caption ? $('Obtener Base64 Imagen').item.json.caption : '' }}\",\n  \"api_chatwoot\": \"NiH1YMSRCLSNeL2h2bHaTudD\",\n  \"url_chatwoot\": \"https://botconnect.interactivo.com.co:8443\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1984,
+        -320
+      ],
+      "id": "f929df6c-83a7-4c21-bf83-b5e1dd099aa6",
+      "name": "Variables imagen"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "select * \nfrom estado_2031509\nwhere cliente = '{{ $('Webhook entrada').item.json.body.remitente_id }}' and tipo = 'TODO_CLARO'\norder by fecha_modificacion desc limit 1",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.4,
+      "position": [
+        -2704,
+        -112
+      ],
+      "id": "b9cb6f4e-c9ec-4df1-b5ea-61decbf1b183",
+      "name": "Obtener estado imagen",
+      "alwaysOutputData": true,
+      "credentials": {
+        "mySql": {
+          "id": "A0zURK0V73szrxpK",
+          "name": "MySQL Bot local"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://evolution-general.interactivo.com.co/chat/getBase64FromMediaMessage/AGENTE_WHATSAPP_TODO_CLARO_7",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "=442CD44A5ECA-40F2-BEAD-A98368629597"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"message\": {\n    \"key\": {\n      \"id\": \"{{ $('Webhook entrada').item.json.body.data.key.id }}\"\n    }\n  },\n  \"convertToMp4\": false\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -2608,
+        -336
+      ],
+      "id": "70ea606b-f115-4b1d-beab-44b960dbb005",
+      "name": "Obtener Base64 Imagen"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://2031510-n8n.interactivo.com.co/webhook/cambio-estado-conversacion-todo-claro",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $('Variables del menú').item.json }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -912,
+        544
+      ],
+      "id": "f8464fcb-c724-4ff1-973b-320398fe90c4",
+      "name": "Validacion error1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://2031510-n8n.interactivo.com.co/webhook/opcion-invalida-todo-claro",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $('Variables del menú').item.json }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        256,
+        416
+      ],
+      "id": "46fc30b7-f417-4fc6-92c7-2a0cbca64181",
+      "name": "Validacion error"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://botconnect.interactivo.com.co:8443/api/v1/accounts/1/conversations/{{ $json.id_conversacion }}/messages",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "api_access_token",
+              "value": "NiH1YMSRCLSNeL2h2bHaTudD"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"content\": \"{{ $('Formato ubicacion').item.json.contenido }}\",\n  \"message_type\": \"incoming\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1648,
+        -512
+      ],
+      "id": "387297c7-9652-4a97-ac8d-e1366e9d69c1",
+      "name": "Ubicacion a Chatwoot1",
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT id_conversacion, id_cuenta\nFROM estado_2031509\nWHERE cliente = '{{ $('Normalizar ubicacion1').item.json.cliente }}'\n  AND tipo = 'TODO_CLARO'\nORDER BY fecha_modificacion DESC\nLIMIT 1;",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.4,
+      "position": [
+        -1872,
+        -512
+      ],
+      "id": "f645fb6b-8eff-4bb4-8360-2e7ceb9c4a7d",
+      "name": "Obtener conversacion ubic1",
+      "alwaysOutputData": false,
+      "credentials": {
+        "mySql": {
+          "id": "A0zURK0V73szrxpK",
+          "name": "MySQL Bot local"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// Detecta ubicacion sin depender de messageType (mas robusto para mensajes reales)\nconst body = $input.item.json.body || {};\nconst data = body.location || {};\n\n// desempaquetar mensajes enviados desde dispositivos vinculados\n// const m = (data.message && data.message.deviceSentMessage && data.message.deviceSentMessage.message)\n//           || data.message || {};\n\n// const live = m.liveLocationMessage || null;\n// const stat = m.locationMessage || null;\n// const loc  = live || stat;\n\nif (!data) { return { esUbicacion: false }; }\n\nconst lat = data.latitude;\nconst lng = data.longitude;\nconst cliente = body.remitente_id;\nconst mapsUrl = `https://www.google.com/maps?q=${lat},${lng}`;\nconst tipoTxt = data.live ? 'su ubicacion EN TIEMPO REAL' : 'su ubicacion';\nconst extra = null;\n\nconst contenido = (`📍 El cliente compartio ${tipoTxt}. ` +\n  (extra ? extra + '. ' : '') +\n  `Coordenadas: ${lat}, ${lng}. Ver en el mapa: ${mapsUrl}`)\n  .replace(/\\n/g, ' ').replace(/\\r/g, ' ').replace(/\\t/g, ' ');\n\nreturn {\n  esUbicacion: true,\n  enVivo: !!data.live,\n  lat, lng, cliente, mapsUrl, contenido,\n  keyId: (data.key && data.key.id) || null,\n  secuencia: data.live ? (data.live.sequenceNumber || null) : null\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2592,
+        -512
+      ],
+      "id": "6c84ac70-bd37-444d-9e08-b52d244711e5",
+      "name": "Normalizar ubicacion1"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// Construye el texto con municipio y departamento a partir de la geocodificacion\nconst n = $('Normalizar ubicacion1').item.json;\nconst g = $json || {};\nconst addr = (g && g.address) || {};\n\nconst departamento = addr.state || '';\nconst municipio = addr.municipality || addr.city || addr.town || addr.county || addr.village || addr.suburb || '';\nconst display = g.display_name || '';\n\nconst lugar = [municipio, departamento].filter(Boolean).join(', ');\nconst tipoTxt = n.enVivo ? 'su ubicacion EN TIEMPO REAL' : 'su ubicacion ACTUAL';\n\nconst contenido = (`📍 El cliente compartio ${tipoTxt}. ` +\n  (lugar ? `Lugar: ${lugar}. ` : '') +\n  (display ? `Direccion aprox.: ${display}. ` : '') +\n  `Coordenadas: ${n.lat}, ${n.lng}. Ver en el mapa: ${n.mapsUrl}`)\n  .replace(/\\n/g, ' ').replace(/\\r/g, ' ').replace(/\\t/g, ' ');\n\nreturn {\n  cliente: n.cliente, lat: n.lat, lng: n.lng, enVivo: n.enVivo,\n  mapsUrl: n.mapsUrl, departamento, municipio, contenido\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2160,
+        -512
+      ],
+      "id": "2876c69e-760d-46c2-ab4c-5585bf189c47",
+      "name": "Formato ubicacion"
+    },
+    {
+      "parameters": {
+        "url": "https://nominatim.openstreetmap.org/reverse",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "format",
+              "value": "jsonv2"
+            },
+            {
+              "name": "lat",
+              "value": "={{ $json.lat }}"
+            },
+            {
+              "name": "lon",
+              "value": "={{ $json.lng }}"
+            },
+            {
+              "name": "zoom",
+              "value": "12"
+            },
+            {
+              "name": "addressdetails",
+              "value": "1"
+            },
+            {
+              "name": "accept-language",
+              "value": "es"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "User-Agent",
+              "value": "todo-claro-bot/1.0 (interactivo.com.co)"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -2352,
+        -512
+      ],
+      "id": "64f7fb73-01f4-4f4d-91d3-220b72b0162c",
+      "name": "Geocodificar",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Variables del menú').item.json.url_chatwoot }}/api/v1/accounts/1/conversations/{{ $('Variables del menú').item.json.id_conversacion }}/messages",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "api_access_token",
+              "value": "={{ $('Variables del menú').item.json.api_chatwoot }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"content\": \"{{ $('Webhook entrada').item.json.body.texto }}\",\n  \"message_type\": \"incoming\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -560,
+        96
+      ],
+      "id": "b0fbfb15-1b0a-48d8-afb7-ecf609c762b3",
+      "name": "Enviar Mensaje Chatwoot Cliente2"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "UPDATE estado_2031509\nSET\n  paso = '-1',\n  fecha_modificacion = NOW(),\n  id_conversacion = '{{$('Variables del menú').item.json.id_conversacion}}',\n  num_advertencia = 0,\n  num_errores = 0,\n  session_wpp = '{{ $('Variables del menú').item.json.session }}',\n  payload = JSON_OBJECT(\n    'from', '{{ $('Webhook entrada').item.json.body.remitente_id }}',\n    'session', '{{ $('Variables del menú').item.json.session }}'\n  ),\n  ori_fields = JSON_ARRAY_APPEND(\n    IFNULL(ori_fields, JSON_ARRAY()),\n    '$',\n    JSON_OBJECT(\n      'respuesta', '{{ $('Webhook entrada').item.json.body.texto }}',\n      'paso', '-1'\n    )\n  )\nWHERE cliente = '{{ $('Webhook entrada').item.json.body.remitente_id }}'\nAND tipo = '{{ $('Variables del menú').item.json.tipo }}'\nAND id_cuenta = '1'\nAND id_inbox = '{{ $('Variables del menú').item.json.inbox_id }}'\nAND id_conversacion = '{{ $('Variables del menú').item.json.id_conversacion }}';",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.4,
+      "position": [
+        1104,
+        864
+      ],
+      "id": "5b2ab1bd-827c-46b3-8742-8ffabb6e0819",
+      "name": "Guardar estado menú principal",
+      "credentials": {
+        "mySql": {
+          "id": "A0zURK0V73szrxpK",
+          "name": "MySQL Bot local"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "923a207f-d67e-4fc5-ba7a-a3a64ae3df50",
+              "leftValue": "={{ $json.body.data.key.fromMe }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "false",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -3536,
+        112
+      ],
+      "id": "869bc413-7cf2-4bdf-9eff-e2e39041674f",
+      "name": "If2"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Variables del menú').item.json.url_evolution }}/message/sendText/{{ $('Variables globales').item.json.session }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "={{ $('Variables del menú').item.json.api_evolution }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"number\": \"{{ $('Webhook entrada').item.json.body.data.key.remoteJid.split('@')[0] }}\",\n    \"text\": \"Para continuar, selecciona la categoría sobre la cual deseas recibir información:\\n\\n1️⃣ Celulares\\n2️⃣ Televisores\\n3️⃣ Portátiles\\n4️⃣ Equipos de sonido\\n5️⃣ Otros productos\\n\\nEscribe el número de la opción de tu interés.\"\n}",
+        "options": {
+          "redirect": {
+            "redirect": {}
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        848,
+        704
+      ],
+      "id": "c8f1eea2-e6f2-403f-87f3-069a33ca7ccd",
+      "name": "HTTP Request9"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Variables del menú').item.json.url_chatwoot }}/api/v1/accounts/1/conversations/{{ $('Variables del menú').item.json.id_conversacion }}/messages",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "api_access_token",
+              "value": "={{ $('Variables del menú').item.json.api_chatwoot }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {}
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"content\": \"Para continuar, selecciona la categoría sobre la cual deseas recibir información:\\n\\n1️⃣ Celulares\\n2️⃣ Televisores\\n3️⃣ Portátiles\\n4️⃣ Equipos de sonido\\n5️⃣ Otros productos\\n\\nEscribe el número de la opción de tu interés.\",\n  \"message_type\": \"outgoing\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        576,
+        864
+      ],
+      "id": "0b230284-7fa9-4620-9a1c-73e5a7d08ee2",
+      "name": "Enviar Mensaje Chatwoot Agente13"
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Variables del menú').item.json.url_chatwoot }}/api/v1/accounts/{{ $('Variables del menú').item.json.id_cuenta }}/inbox_members/{{ $('Variables del menú').item.json.inbox_id }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "api_access_token",
+              "value": "={{ $('Variables del menú').item.json.api_chatwoot }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1712,
+        864
+      ],
+      "id": "9b224479-5187-425f-82b1-b7c17555abc1",
+      "name": "HTTP Request3"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Variables del menú').item.json.url_chatwoot }}/api/v1/accounts/{{ $('Variables del menú').item.json.id_cuenta }}/conversations/{{ $('Variables del menú').item.json.id_conversacion }}/assignments",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "api_access_token",
+              "value": "={{ $('Variables del menú').item.json.api_chatwoot }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"assignee_id\": {{ $json.agentId }}\n} ",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2976,
+        848
+      ],
+      "id": "0a87e1d5-9c35-4510-bf0a-e7767e0befa1",
+      "name": "Asignar agente1"
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Variables del menú').item.json.url_chatwoot }}/api/v1/accounts/{{ $('Variables del menú').item.json.id_cuenta }}/conversations?assignee_type=assigned&status=open&inbox_id={{ $('Variables del menú').item.json.inbox_id }}&labels[]=asignado-asesor&page=1",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "api_access_token",
+              "value": "={{ $('Variables del menú').item.json.api_chatwoot }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2512,
+        848
+      ],
+      "id": "9373c57a-ff44-41ac-b124-d26412f2717a",
+      "name": "Obtener conversaciones totales1"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"label_original\": \"{{ $('Variables del menú').item.json.etiqueta_chatwoot }}\",\n  \"label1\": \"agente_terminales\"\n}\n ",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1328,
+        864
+      ],
+      "id": "33f851de-432a-495a-93c8-05d3001fb07c",
+      "name": "obtener label"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Variables del menú').item.json.url_chatwoot }}/api/v1/accounts/1/conversations/{{ $('Variables del menú').item.json.id_conversacion }}/labels",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "api_access_token",
+              "value": "={{ $('Variables del menú').item.json.api_chatwoot }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"labels\": [\n    \"{{ $json.label_original }}\", \"{{ $json.label1 }}\"\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1504,
+        864
+      ],
+      "id": "4637c27a-4ba1-4e74-8a6d-e36a3a409d2c",
+      "name": "Asignar a asesor",
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "jsCode": "// Obtener los inputs del nodo anterior\n\nconst conversationsInput = $input.first().json.data.payload; // conversaciones\n\nconst availableAgents = $('Code').first().json.availableAgents; // array directamente\n\n// Inicializamos el resultado\nconst result = [];\n\nfor (const agent of availableAgents) {\n  const agentId = agent.id;\n\n  // Filtramos las conversaciones asignadas a este agente\n  const assignedConversations = conversationsInput.filter(conv => {\n    return conv.meta?.assignee?.id === agentId;\n  });\n\n  result.push({\n    agentId,\n    assignedConversations: assignedConversations.length\n  });\n}\n\n// Encontrar el agente con menos conversaciones asignadas\nlet minAssigned = result[0];\n\nfor (const agent of result) {\n  if (agent.assignedConversations < minAssigned.assignedConversations) {\n    minAssigned = agent;\n  }\n}\n\n// Retornar solo ese agente\nreturn [\n  {\n    json: minAssigned\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2752,
+        848
+      ],
+      "id": "07f4661b-b31b-4a65-bc5a-f47acc338207",
+      "name": "Code1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "000ce494-542c-449e-9f42-1035c529972c",
+              "leftValue": "={{ $json.agentsFound }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2192,
+        864
+      ],
+      "id": "47895f32-242d-4b63-882b-9ec6fc9c03d5",
+      "name": "Agentes en linea"
+    },
+    {
+      "parameters": {
+        "jsCode": "let agentsFound = false;\nlet availableAgents = [];\n\n// Recorremos el array de agentes\nlet array = $input.all()[0].json.payload;\nfor (const agent of array) {\n  if (agent.availability_status === 'online') {\n  //if (true) {\n    \n    agentsFound = true;\n    availableAgents.push(agent);\n  }\n}\n\n// Devolver un solo item con los resultados\nreturn [\n  {\n    json: {\n      agentsFound,\n      availableAgents,\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1952,
+        864
+      ],
+      "id": "48a34013-d525-4ae9-bd7c-2cdf1bc7fd29",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Webhook entrada').item.json.body.texto }}",
+                    "rightValue": "1",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "fff04eae-27ba-47e1-a463-00b2328bcece"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "1"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "3e022ac5-1d9d-4adc-8572-94fda4d0920c",
+                    "leftValue": "={{ $('Webhook entrada').item.json.body.texto }}",
+                    "rightValue": "2",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "2"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra"
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.3,
+      "position": [
+        -288,
+        352
+      ],
+      "id": "14dc7c5a-a513-4a98-90e6-8b477a22a34f",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://e2ecti.interactivo.com.co/E2E/gettoken",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "user",
+              "value": "LaiaAP1"
+            },
+            {
+              "name": "passw",
+              "value": "083oXD*cYC"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1472,
+        80
+      ],
+      "id": "00e63fc3-dabd-4003-887a-3262add8bb11",
+      "name": "HTTP Request2"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://e2ecti.interactivo.com.co//E2E/insertLeadPhone",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "marktel-access-token",
+              "value": "={{ $json.token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "=[\n  {\n    \"idLeadProvider\": \"{{ $('Variables del menú').item.json.id_conversacion }}\",\n    \"provider\": \"\",\n    \"firstName\": \"\",\n    \"lastName\": \"\",\n    \"phone\": \"{{ $('Webhook entrada').item.json.body.texto.replace('57', '') }}\",\n    \"phone2\": \"\",\n    \"phone3\": \"\",\n    \"phone4\": \"\",\n    \"canal\": \"CTI\",\n    \"gender\": \"\",\n    \"birthdate\": \"\",\n    \"address\": \"\",\n    \"age\": null,\n    \"url\": \"\",\n    \"legalText\": \"\",\n    \"optin\": \"\",\n    \"cpl\": \"\",\n    \"c2cDate\": \"{{ $now.minus({ hours: 1 }).toFormat('yyyy-MM-dd HH:mm:ss') }}\",\n    \"leadDate\": \"{{ $now.minus({ hours: 1 }).toFormat('yyyy-MM-dd HH:mm:ss') }}\",\n    \"expirationDate\": null,\n    \"internationalDP\": \"\",\n    \"leadExclusivity\": \"\",\n    \"verticality\": \"\",\n    \"typeLead\": 1,\n    \"utmCampaign\": \"\",\n    \"utmSource\": \"-\",\n    \"utmMedium\": \"\",\n    \"cti\": \"GoContact\",\n    \"campaignId\": \"209\",\n    \"providerService\": \"CTI\",\n    \"category\": \"\",\n    \"priority\": 1,\n    \"agentId\": \"\",\n    \"CustomData1\": \"\",\n    \"CustomData2\": \"\",\n    \"CustomData3\": \"\",\n    \"CustomData4\": \"\",\n    \"CustomData5\": \"\",\n    \"CustomData6\": \"\",\n    \"CustomData7\": \"\",\n    \"CustomData8\": \"\",\n    \"CustomData9\": \"\",\n    \"CustomData10\": \"\",\n    \"CustomData11\": \"\",\n    \"CustomData12\": \"\",\n    \"CustomData13\": \"\",\n    \"CustomData14\": \"\",\n    \"CustomData15\": \"\",\n    \"CustomData16\": \"\",\n    \"CustomData17\": \"\",\n    \"CustomData18\": \"\",\n    \"CustomData19\": \"\",\n    \"CustomData20\": \"\"\n  }\n]",
+        "options": {
+          "redirect": {
+            "redirect": {}
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1696,
+        160
+      ],
+      "id": "d964a484-f0c9-49f6-9bc9-cb297abc519d",
+      "name": "HTTP Request1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Variables del menú').item.json.url_chatwoot }}/api/v1/accounts/1/conversations/{{\n$if(\n  $('Crear Conversación').isExecuted,\n  $('Crear Conversación').item.json.id,\n  $('Crear Conversación1').item.json.id\n)\n}}/messages",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "api_access_token",
+              "value": "={{ $('Variables del menú').item.json.api_chatwoot }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"content\": \"{{ $('Webhook entrada').item.json.body.texto }}\",\n  \"message_type\": \"incoming\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1056,
+        -224
+      ],
+      "id": "6fee4e65-a920-4014-8dca-6d1c499a3cb1",
+      "name": "Enviar Mensaje Chatwoot Cliente"
+    },
+    {
+      "parameters": {
+        "amount": 3
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        672,
+        -384
+      ],
+      "id": "d834dd4f-3a78-488f-b10e-ffa18823db7c",
+      "name": "Wait5",
+      "webhookId": "fddb1033-684a-45ec-99ed-7a924444a2e3"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Variables del menú').item.json.url_chatwoot }}/api/v1/accounts/1/conversations",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "api_access_token",
+              "value": "={{ $('Variables del menú').item.json.api_chatwoot }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"source_id\": \"{{ $json.payload.contact.identifier }}\",\n  \"inbox_id\": \"{{ $('Variables del menú').item.json.inbox_id }}\",\n  \"contact_id\": \"{{ $json.payload.contact.id }}\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        656,
+        -48
+      ],
+      "id": "14c22ad1-78b7-4811-8345-6cdddbf3a723",
+      "name": "Crear Conversación1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "c072ad80-1948-4c04-afaa-827d250d0412",
+              "leftValue": "={{ $json.meta.count }}",
+              "rightValue": "=0",
+              "operator": {
+                "type": "number",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        96,
+        -208
+      ],
+      "id": "83779b95-6720-464d-8e36-ff91539404bf",
+      "name": "Si Contacto Existe"
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Variables del menú').item.json.url_chatwoot }}/api/v1/accounts/1/contacts/search?q={{ $json.payload.remitente_id }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "api_access_token",
+              "value": "={{ $('Variables del menú').item.json.api_chatwoot }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -560,
+        -208
+      ],
+      "id": "ca349416-4c00-4b93-90e8-dc6f5d87dafe",
+      "name": "GET CONTACT",
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Variables del menú').item.json.url_chatwoot }}/api/v1/accounts/1/conversations",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "api_access_token",
+              "value": "={{ $('Variables del menú').item.json.api_chatwoot }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"source_id\": \"{{ $json.payload[0].id }}\",\n  \"inbox_id\": \"{{ $('Variables del menú').item.json.inbox_id }}\",\n  \"contact_id\": \"{{ $json.payload[0].id }}\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        448,
+        -384
+      ],
+      "id": "5f637aaa-40cb-4037-a13b-18341cb5385f",
+      "name": "Crear Conversación",
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Variables del menú').item.json.url_chatwoot }}/api/v1/accounts/1/contacts",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "api_access_token",
+              "value": "={{ $('Variables del menú').item.json.api_chatwoot }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"name\": \"\",\n  \"identifier\": \"{{ $('Webhook entrada').item.json.body.remitente_id }}\",\n  \"inbox_id\": {{ $('Variables del menú').item.json.inbox_id }},\n  \"source_id\": \"{{ $('Webhook entrada').item.json.body.remitente_id }}\",\n \"custom_attributes\": {\n    \"bot\": \"on\"\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        432,
+        -48
+      ],
+      "id": "3c263d01-fb19-46d4-863a-303c8f2dc21e",
+      "name": "Crea Contacto ChatWoot",
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Variables del menú').item.json.url_chatwoot }}/api/v1/accounts/1/conversations/{{ $('Variables del menú').item.json.id_conversacion }}/messages",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "api_access_token",
+              "value": "={{ $('Variables del menú').item.json.api_chatwoot }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"content\": \"{{ $json.payload.texto }}\",\n  \"message_type\": \"incoming\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -496,
+        368
+      ],
+      "id": "997b7a65-c9e7-4bfa-a0f9-1658966cb36f",
+      "name": "Enviar Mensaje Chatwoot Cliente1"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "da207ff9-a2ca-49e2-907a-f71e3711585b",
+                    "leftValue": "={{ $json.body.tipo }}",
+                    "rightValue": "location",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "location"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.body.tipo }}",
+                    "rightValue": "texto",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "a8718a43-da7f-4bf9-8876-9447c6ab73bd"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Texto"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "de9f7833-dbee-4ffe-bdc5-2043a0cbcd0f",
+                    "leftValue": "={{ $json.body.tipo }}",
+                    "rightValue": "audioMessage",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Audio"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "955711e8-a412-4f4d-8c8a-ed8554405949",
+                    "leftValue": "={{ $json.body.tipo }}",
+                    "rightValue": "media",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "media"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -3200,
+        48
+      ],
+      "id": "4a0015a2-5e70-4022-ad48-cb4628be796d",
+      "name": "Switch2"
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Variables del menú').item.json.url_chatwoot }}/api/v1/accounts/1/inbox_members/{{ $('Variables del menú').item.json.inbox_id }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "api_access_token",
+              "value": "={{ $('Variables del menú').item.json.api_chatwoot }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1680,
+        -224
+      ],
+      "id": "4465528b-0e79-41fe-b5f0-98342bb28427",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Variables del menú').item.json.url_chatwoot }}/api/v1/accounts/1/conversations/{{\n$if(\n  $('Crear Conversación').isExecuted,\n  $('Crear Conversación').item.json.id,\n  $('Crear Conversación1').item.json.id\n)\n}}/labels",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "api_access_token",
+              "value": "={{ $('Variables del menú').item.json.api_chatwoot }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"labels\": [\n    \"{{ $json.label }}\"\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1472,
+        -224
+      ],
+      "id": "8bcf4068-fdef-4a7d-8e8c-31c3aabe0f40",
+      "name": "Asignar a asesor3",
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"label\": \"claro-terminales\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1264,
+        -224
+      ],
+      "id": "e4ee69e7-8014-4907-b878-45eb0b8a58d4",
+      "name": "obtener label3"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "UPDATE estado_2031509\nSET\n  telefono = '{{ $('Webhook entrada').item.json.body.texto }}',\n  paso = '3',\n  fecha_modificacion = NOW(),\n  id_conversacion = '{{$('Variables del menú').item.json.id_conversacion}}',\n  num_advertencia = 0,\n  num_errores = 0,\n  session_wpp = '{{ $('Variables del menú').item.json.session }}',\n  payload = JSON_OBJECT(\n    'from', '{{ $('Webhook entrada').item.json.body.remitente_id }}',\n    'session', '{{ $('Variables del menú').item.json.session }}'\n  ),\n  ori_fields = JSON_ARRAY_APPEND(\n    IFNULL(ori_fields, JSON_ARRAY()),\n    '$',\n    JSON_OBJECT(\n      'respuesta', '{{ $('Webhook entrada').item.json.body.texto }}',\n      'paso', '3'\n    )\n  )\nWHERE cliente = '{{ $('Webhook entrada').item.json.body.remitente_id }}'\nAND tipo = '{{ $('Variables del menú').item.json.tipo }}'\nAND id_cuenta = '1'\nAND id_inbox = '{{ $('Variables del menú').item.json.inbox_id }}'\nAND id_conversacion = '{{ $('Variables del menú').item.json.id_conversacion }}';",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.4,
+      "position": [
+        1200,
+        128
+      ],
+      "id": "1fe02b68-79fc-435e-bfc1-0fc2e3390d61",
+      "name": "Guardar estado menú principal2",
+      "credentials": {
+        "mySql": {
+          "id": "A0zURK0V73szrxpK",
+          "name": "MySQL Bot local"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Variables del menú').item.json.url_evolution }}/message/sendText/{{ $('Variables globales').item.json.session }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "={{ $('Variables del menú').item.json.api_evolution }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"number\": \"{{ $('Webhook entrada').item.json.body.data.key.remoteJid.split('@')[0] }}\",\n    \"text\": \"Tu solicitud ha sido registrada correctamente.\\n\\nPróximamente, uno de nuestros asesores se pondrá en contacto contigo para continuar con el proceso y proporcionarte la información solicitada.\\n\\nGracias por comunicarte con nosotros. 🔵🤝\"\n}",
+        "options": {
+          "redirect": {
+            "redirect": {}
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        160,
+        -16
+      ],
+      "id": "406c2a40-512b-44a9-a1c4-4b404f19f965",
+      "name": "HTTP Request8"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Variables del menú').item.json.url_chatwoot }}/api/v1/accounts/1/conversations/{{ $('Variables del menú').item.json.id_conversacion }}/messages",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "api_access_token",
+              "value": "={{ $('Variables del menú').item.json.api_chatwoot }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {}
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"content\": \"Tu solicitud ha sido registrada correctamente.\\n\\nPróximamente, uno de nuestros asesores se pondrá en contacto contigo para continuar con el proceso y proporcionarte la información solicitada.\\n\\nGracias por comunicarte con nosotros. 🔵🤝\",\n  \"message_type\": \"incoming\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        608,
+        240
+      ],
+      "id": "c56d1a3e-1b5e-46f4-b71e-79e580d65e4f",
+      "name": "Enviar Mensaje Chatwoot Agente12"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO estado_2031509 (\n  cliente, paso, tipo, id_cuenta, id_inbox, id_conversacion, num_advertencia, num_errores, fecha_modificacion, session_wpp, payload, ori_fields, etiqueta_chatwoot\n)\nVALUES (\n  '{{ $('Webhook entrada').item.json.body.remitente_id }}',\n  '2', '{{ $('Variables del menú').item.json.tipo }}',\n  '1',\n  '{{$('Variables del menú').item.json.inbox_id}}',\n  '{{\n$if(\n  $('Crear Conversación').isExecuted,\n  $('Crear Conversación').item.json.id,\n  $('Crear Conversación1').item.json.id\n)\n}}',\n  0,\n  0,\n  NOW(), \n  '{{ $('Variables globales').item.json.session}}',\n  '{\"from\":\"{{ $('Webhook entrada').item.json.body.remitente_id }}\",\"session\":\"{{$('Variables globales').item.json.session}}\"}',\n JSON_ARRAY(\n  JSON_OBJECT(\n    'respuesta', '{{ $('Webhook entrada').item.json.body.texto }}',\n    'paso', '2'\n  )\n), '{{ $('obtener label3').item.json.label }}'\n)\nON DUPLICATE KEY UPDATE\n  paso = VALUES(paso),\n  fecha_modificacion = NOW(),\n  id_conversacion = VALUES(id_conversacion),\n  etiqueta_chatwoot = VALUES(etiqueta_chatwoot),\n  num_advertencia = 0,\n  num_errores = 0,\n  session_wpp = VALUES(session_wpp),\n  payload = VALUES(payload),\n  ori_fields = JSON_ARRAY(\n    JSON_OBJECT(\n      'respuesta', '{{ $('Webhook entrada').item.json.body.data.message.conversation }}',\n      'paso', '2'\n    )\n  );",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.4,
+      "position": [
+        2608,
+        -224
+      ],
+      "id": "f6dee5c3-856f-466c-8c89-d924bc6a0f57",
+      "name": "Guardar estado menú principal1",
+      "credentials": {
+        "mySql": {
+          "id": "A0zURK0V73szrxpK",
+          "name": "MySQL Bot local"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.estado_actual }}",
+                    "rightValue": "undefined",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "2c55b4ee-6916-4df0-8058-d7ef38160dbd"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "undefined"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "aff04b8d-ff5b-40a0-9380-e9e10575500f",
+                    "leftValue": "={{ $json.estado_actual }}",
+                    "rightValue": "0",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "0"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "061792b2-0889-4ffe-86a5-777c79f50e60",
+                    "leftValue": "={{ $json.estado_actual }}",
+                    "rightValue": "1000",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "1000"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "94d6b828-ebfe-4916-beb8-b6b2e32a57d3",
+                    "leftValue": "={{ $json.estado_actual }}",
+                    "rightValue": "1",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "1"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "0c565efd-5528-4322-ae2e-e8e7d4d550c7",
+                    "leftValue": "={{ $json.estado_actual }}",
+                    "rightValue": "2",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "2"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "df69d221-b2b9-420a-b440-662c52885706",
+                    "leftValue": "={{ $json.estado_actual }}",
+                    "rightValue": "-1",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "-1"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "d3f8321f-740c-446a-b59a-f598361c0209",
+                    "leftValue": "={{ $json.estado_actual }}",
+                    "rightValue": "3",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "3"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "db531612-dab7-4cba-9d96-5bb16bad1479",
+                    "leftValue": "={{ $json.estado_actual }}",
+                    "rightValue": "4",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "4"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "64f594a9-422c-47a4-8dbf-17ef4128ae42",
+                    "leftValue": "={{ $json.estado_actual }}",
+                    "rightValue": "6",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "6"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra"
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.3,
+      "position": [
+        -1152,
+        -16
+      ],
+      "id": "9f4181fa-aa58-4f9e-bbc5-082e752a573e",
+      "name": "Enrutar por estado1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Variables del menú').item.json.url_chatwoot }}/api/v1/accounts/1/conversations/{{ $('Variables del menú').item.json.id_conversacion }}/messages",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "api_access_token",
+              "value": "={{ $('Variables del menú').item.json.api_chatwoot }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"content\": \"Soy tu asistente virtual de Ventas de Claro Tecnología 👋🏻\\n\\nPara continuar la conversación por este canal, es necesaria tu autorización para el tratamiento de tus datos según la Política de tratamiento de la información http://bit.ly/3DtS9az y la aceptación de los términos y condiciones de funcionamiento y uso de nuestro WhatsApp Claro. https://www.claro.com.co/personas/autogestion/whatsapp/.\\n\\n¿Autorizas el tratamiento de tus datos? Responde con el número de tu elección:\\n\\n1. Sí, autorizo\\n\\n2. No autorizo\",\n  \"message_type\": \"outgoing\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        128,
+        624
+      ],
+      "id": "a95b905c-1cc5-46aa-99d4-31ca2add6712",
+      "name": "Habeas Chatwoot",
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Variables del menú').item.json.url_evolution }}/message/sendText/{{ $('Variables globales').item.json.session }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "={{ $('Variables del menú').item.json.api_evolution }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"number\": \"{{ $('Webhook entrada').item.json.body.data.key.remoteJid.split('@')[0] }}\",\n  \"text\": \"Soy tu asistente virtual de Ventas de Claro Tecnología 👋🏻\\n\\nPara continuar la conversación por este canal, es necesaria tu autorización para el tratamiento de tus datos según la Política de tratamiento de la información http://bit.ly/3DtS9az y la aceptación de los términos y condiciones de funcionamiento y uso de nuestro WhatsApp Claro. https://www.claro.com.co/personas/autogestion/whatsapp/.\\n\\n¿Autorizas el tratamiento de tus datos? Responde con el número de tu elección:\\n\\n1. Sí, autorizo\\n\\n2. No autorizo\"\n}",
+        "options": {
+          "redirect": {
+            "redirect": {}
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        336,
+        784
+      ],
+      "id": "be297609-0b2f-4269-bcc7-45586f7e3eac",
+      "name": "Habeas WhatsApp"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "UPDATE estado_2031509\nSET\n  paso = '4',\n  fecha_modificacion = NOW(),\n  id_conversacion = '{{ $('Variables del menú').item.json.id_conversacion }}',\n  num_advertencia = 0,\n  num_errores = 0,\n  session_wpp = '{{ $('Variables del menú').item.json.session }}',\n  payload = JSON_OBJECT(\n    'from', '{{ $('Webhook entrada').item.json.body.remitente_id }}',\n    'session', '{{ $('Variables del menú').item.json.session }}'\n  ),\n  ori_fields = JSON_ARRAY_APPEND(\n    IFNULL(ori_fields, JSON_ARRAY()),\n    '$',\n    JSON_OBJECT(\n      'respuesta', '{{ ($('Webhook entrada').item.json.body.texto || '').trim() }}',\n      'paso', '4'\n    )\n  )\nWHERE cliente = '{{ $('Webhook entrada').item.json.body.remitente_id }}'\nAND tipo = '{{ $('Variables del menú').item.json.tipo }}'\nAND id_cuenta = '1'\nAND id_inbox = '{{ $('Variables del menú').item.json.inbox_id }}'\nAND id_conversacion = '{{ $('Variables del menú').item.json.id_conversacion }}';",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.4,
+      "position": [
+        608,
+        608
+      ],
+      "id": "1fae4de2-36a0-4315-8a6f-875026157cf6",
+      "name": "Guardar estado habeas",
+      "credentials": {
+        "mySql": {
+          "id": "A0zURK0V73szrxpK",
+          "name": "MySQL Bot local"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Variables del menú').item.json.url_chatwoot }}/api/v1/accounts/1/conversations/{{ $('Variables del menú').item.json.id_conversacion }}/messages",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "api_access_token",
+              "value": "={{ $('Variables del menú').item.json.api_chatwoot }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"content\": \"{{ $('Webhook entrada').item.json.body.texto }}\",\n  \"message_type\": \"incoming\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -144,
+        976
+      ],
+      "id": "ed962df0-76dd-4677-97f8-632e8eed35c4",
+      "name": "Registrar respuesta habeas",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "0ccbf315-2f26-4778-a391-ee5d4dc21f29",
+              "leftValue": "={{ ['1','2'].includes(( $('Webhook entrada').item.json.body.texto || '').trim()) }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        80,
+        976
+      ],
+      "id": "193058ab-3a48-4004-bc10-746fee744926",
+      "name": "¿Responde SI o NO?"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "bb7e5949-2d77-41f9-93fe-c380eb644262",
+              "leftValue": "={{ ( $('Webhook entrada').item.json.body.texto|| '').trim() === '1' }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        304,
+        976
+      ],
+      "id": "b16ae90d-eb38-4c5d-9cb1-359d777c73d7",
+      "name": "¿Acepta habeas?"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Variables del menú').item.json.url_chatwoot }}/api/v1/accounts/1/conversations/{{ $('Variables del menú').item.json.id_conversacion }}/messages",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "api_access_token",
+              "value": "={{ $('Variables del menú').item.json.api_chatwoot }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"content\": \"Gracias por tu respuesta. Respetamos tu decisión de no continuar la atención por WhatsApp.\\n\\nPara dar continuidad a tu solicitud, nos comunicaremos por vía telefónica.\\n\\nGracias por tu tiempo. ¡Que tengas un excelente día! 🔵🤝\",\n  \"message_type\": \"outgoing\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        528,
+        1136
+      ],
+      "id": "bfe3ef75-991c-4a0e-8194-6e1e691e9c78",
+      "name": "Rechazo Chatwoot"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Variables del menú').item.json.url_evolution }}/message/sendText/{{ $('Variables globales').item.json.session }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "={{ $('Variables del menú').item.json.api_evolution }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"number\": \"{{ $('Webhook entrada').item.json.body.data.key.remoteJid.split('@')[0] }}\",\n  \"text\": \"Gracias por tu respuesta. Respetamos tu decisión de no continuar la atención por WhatsApp.\\n\\nPara dar continuidad a tu solicitud, nos comunicaremos por vía telefónica.\\n\\nGracias por tu tiempo. ¡Que tengas un excelente día! 🔵🤝\"\n}",
+        "options": {
+          "redirect": {
+            "redirect": {}
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        752,
+        1296
+      ],
+      "id": "ed7ba698-80b0-45ad-87b8-fa23acb96828",
+      "name": "Rechazo WhatsApp"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "UPDATE estado_2031509\nSET\n  paso = '1000',\n  fecha_modificacion = NOW(),\n  id_conversacion = '{{ $('Variables del menú').item.json.id_conversacion }}',\n  num_advertencia = 0,\n  num_errores = 0,\n  session_wpp = '{{ $('Variables del menú').item.json.session }}',\n  payload = JSON_OBJECT(\n    'from', '{{ $('Webhook entrada').item.json.body.remitente_id }}',\n    'session', '{{ $('Variables del menú').item.json.session }}'\n  ),\n  ori_fields = JSON_ARRAY_APPEND(\n    IFNULL(ori_fields, JSON_ARRAY()),\n    '$',\n    JSON_OBJECT(\n      'respuesta', '{{ ($('Webhook entrada').item.json.body.texto || '').trim() }}',\n      'paso', '1000'\n    )\n  )\nWHERE cliente = '{{ $('Webhook entrada').item.json.body.remitente_id }}'\nAND tipo = '{{ $('Variables del menú').item.json.tipo }}'\nAND id_cuenta = '1'\nAND id_inbox = '{{ $('Variables del menú').item.json.inbox_id }}'\nAND id_conversacion = '{{ $('Variables del menú').item.json.id_conversacion }}';",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.4,
+      "position": [
+        976,
+        1136
+      ],
+      "id": "88535b53-050b-426b-8b79-c0d35e6c11b4",
+      "name": "Guardar estado rechazo",
+      "credentials": {
+        "mySql": {
+          "id": "A0zURK0V73szrxpK",
+          "name": "MySQL Bot local"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Variables del menú').item.json.url_evolution }}/message/sendText/{{ $('Variables globales').item.json.session }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "={{ $('Variables del menú').item.json.api_evolution }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"number\": \"{{ $('Webhook entrada').item.json.body.data.key.remoteJid }}\",\n    \"text\": \"¡Hola! 👋\\n\\nSoy LEO, asesor virtual de Claro.\\n\\nQueremos contarte que actualmente podrías acceder a una oferta comercial exclusiva de Claro, sujeta a validación.\\n\\nSi deseas conocer los beneficios disponibles para ti, estaré encantado de ayudarte.\\n\\nSelecciona una opción para continuar:\\n\\n☎️ 1️⃣ Solicitar una llamada de un asesor.\\n💬 2️⃣ Continuar la atención por WhatsApp.\"\n}",
+        "options": {
+          "redirect": {
+            "redirect": {}
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2352,
+        -384
+      ],
+      "id": "40a3479e-ab95-4858-b6ba-d36f94f14841",
+      "name": "HTTP Request7"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Variables del menú').item.json.url_chatwoot }}/api/v1/accounts/1/conversations/{{\n$if(\n  $('Crear Conversación').isExecuted,\n  $('Crear Conversación').item.json.id,\n  $('Crear Conversación1').item.json.id\n)\n}}/messages",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "api_access_token",
+              "value": "={{ $('Variables del menú').item.json.api_chatwoot }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {}
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"content\": \"¡Hola! 👋\\n\\nSoy LEO, asesor virtual de Claro.\\n\\nQueremos contarte que actualmente podrías acceder a una oferta comercial exclusiva de Claro, sujeta a validación.\\n\\nSi deseas conocer los beneficios disponibles para ti, estaré encantado de ayudarte.\\n\\nSelecciona una opción para continuar:\\n\\n☎️ 1️⃣ Solicitar una llamada de un asesor.\\n💬 2️⃣ Continuar la atención por WhatsApp.\",\n  \"message_type\": \"outgoing\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2160,
+        -224
+      ],
+      "id": "de32f686-5dc1-46c9-9d94-a2f94f9b25ff",
+      "name": "Enviar Mensaje Chatwoot Agente"
+    },
+    {
+      "parameters": {
+        "amount": 4
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1904,
+        -224
+      ],
+      "id": "493a99b8-63d8-44aa-a6ab-72a8d58a0146",
+      "name": "Wait1",
+      "webhookId": "1d56d41f-6395-44eb-ac10-ba06f6d3fd8e"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"integracion\": \"WAHA\",\n  \"tipo\": \"{{ $('Variables globales').item.json.tipo }}\",\n  \"payload\": {{ $('Variables globales').item.json.payload }},\n  \"estado_actual\": \"{{ $json.paso }}\",\n  \"id_cuenta\": \"{{ $json.id_cuenta }}\",\n  \"id_conversacion\": \"{{ $json.id_conversacion }}\",\n  \"etiqueta_chatwoot\": \"{{ $json.etiqueta_chatwoot }}\",\n  \"api_chatwoot\": \"NiH1YMSRCLSNeL2h2bHaTudD\",\n  \"url_chatwoot\": \"https://chatwoot-general.interactivo.com.co\",\n  \"api_wp\":\"64cc4b90db614c639f3ae476423d5689\",\n  \"url_wp\": \"https://wpp-general.interactivo.com.co\",\n\"session_wp\":\"AGENTE_WHATSAPP_TODO_CLARO_7\",\n\"inbox_id\":\"11\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1568,
+        80
+      ],
+      "id": "a763b003-7ec0-46ef-8d4b-383eb60ac29e",
+      "name": "Variables del menú"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "f869c6de-12e8-4b76-9fd8-a38d65636d10",
+                    "leftValue": "={{ $('Variables del menú').item.json.inbox_id }}",
+                    "rightValue": "11",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "inbox11"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -336,
+        -208
+      ],
+      "id": "9924fba3-d3ae-47a1-b486-24524e6752b4",
+      "name": "Filtro Inbox 11"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "select * \nfrom estado_2031509\nwhere cliente = '{{ $('Webhook entrada').item.json.body.remitente_id }}' and tipo = '{{ $('Variables globales').item.json.tipo }}'\norder by fecha_modificacion desc limit 1",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.4,
+      "position": [
+        -1776,
+        80
+      ],
+      "id": "acf93f18-f43a-4d6f-986e-d82ebf9eccc5",
+      "name": "Obtener estado del usuario",
+      "alwaysOutputData": true,
+      "credentials": {
+        "mySql": {
+          "id": "A0zURK0V73szrxpK",
+          "name": "MySQL Bot local"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"tipo\": \"TODO_CLARO\",\n  \"session\":\"CLARO_MOVIL\",\n  \"payload\": {{$('Webhook entrada').item.json.body}}\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2224,
+        80
+      ],
+      "id": "d40737fe-c579-4d06-9747-038722554d62",
+      "name": "Variables globales"
+    },
+    {
+      "parameters": {
+        "table": {
+          "__rl": true,
+          "value": "bot_log_v2",
+          "mode": "list",
+          "cachedResultName": "bot_log_v2"
+        },
+        "dataMode": "defineBelow",
+        "valuesToSend": {
+          "values": [
+            {
+              "column": "tipo",
+              "value": "={{ $json.tipo }}"
+            },
+            {
+              "column": "id_cuenta",
+              "value": "1"
+            },
+            {
+              "column": "id_conversacion"
+            },
+            {
+              "column": "payload",
+              "value": "={{JSON.stringify( $('Webhook entrada').item.json.body) }}"
+            },
+            {
+              "column": "cliente",
+              "value": "={{ $json.payload.remitente_id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.4,
+      "position": [
+        -1984,
+        80
+      ],
+      "id": "873646ff-db1c-4489-9ad3-faf1347fea31",
+      "name": "Log de interacción",
+      "credentials": {
+        "mySql": {
+          "id": "A0zURK0V73szrxpK",
+          "name": "MySQL Bot local"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "bot-whatsapp-todo-claro",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -3744,
+        112
+      ],
+      "id": "8779f6c2-20fa-4501-b173-33185675f84b",
+      "name": "Webhook entrada",
+      "webhookId": "e6b38492-3cdb-45e6-a192-d468d110dba6"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://n8n-general.interactivo.com.co/webhook/envio-whatsapp-todo-claro",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n\"variable\":  {{ $('Variables del menú').item.json.toJsonString() }},\n  \"tipo_mensaje\": \"texto\",\n  \"mensaje\": \"¡Hola! 👋\\n\\nSoy LEO, asesor virtual de Claro.\\n\\nQueremos contarte que actualmente podrías acceder a una oferta comercial exclusiva de Claro, sujeta a validación.\\n\\nSi deseas conocer los beneficios disponibles para ti, estaré encantado de ayudarte.\\n\\nSelecciona una opción para continuar:\\n\\n☎️ 1️⃣ Solicitar una llamada de un asesor.\\n💬 2️⃣ Continuar la atención por WhatsApp.\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2368,
+        -224
+      ],
+      "id": "f6e8bb57-5d98-4923-9901-c516b714b1e3",
+      "name": "HTTP Request4"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://n8n-general.interactivo.com.co/webhook/envio-whatsapp-todo-claro",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n\"variable\":  {{ $('Variables del menú').item.json.toJsonString() }},\n  \"tipo_mensaje\": \"texto\",\n  \"mensaje\": \"Soy tu asistente virtual de Ventas de Claro Tecnología 👋🏻\\n\\nPara continuar la conversación por este canal, es necesaria tu autorización para el tratamiento de tus datos según la Política de tratamiento de la información http://bit.ly/3DtS9az y la aceptación de los términos y condiciones de funcionamiento y uso de nuestro WhatsApp Claro. https://www.claro.com.co/personas/autogestion/whatsapp/.\\n\\n¿Autorizas el tratamiento de tus datos? Responde con el número de tu elección:\\n\\n1. Sí, autorizo\\n\\n2. No autorizo\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        384,
+        608
+      ],
+      "id": "0af4554c-0552-4343-9588-6ffcd2e0870d",
+      "name": "HTTP Request5"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://n8n-general.interactivo.com.co/webhook/envio-whatsapp-todo-claro",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n\"variable\":  {{ $('Variables del menú').item.json.toJsonString() }},\n  \"tipo_mensaje\": \"texto\",\n  \"mensaje\": \"Para continuar, selecciona la categoría sobre la cual deseas recibir información:\\n\\n1️⃣ Celulares\\n2️⃣ Televisores\\n3️⃣ Portátiles\\n4️⃣ Equipos de sonido\\n5️⃣ Otros productos\\n\\nEscribe el número de la opción de tu interés.\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        848,
+        864
+      ],
+      "id": "d27ef5a0-e6de-4c90-be12-2dbe9ce8dfd3",
+      "name": "HTTP Request6"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://n8n-general.interactivo.com.co/webhook/envio-whatsapp-todo-claro",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n\"variable\":  {{ $('Variables del menú').item.json.toJsonString() }},\n  \"tipo_mensaje\": \"texto\",\n  \"mensaje\": \"Gracias por tu respuesta. Respetamos tu decisión de no continuar la atención por WhatsApp.\\n\\nPara dar continuidad a tu solicitud, nos comunicaremos por vía telefónica.\\n\\nGracias por tu tiempo. ¡Que tengas un excelente día! 🔵🤝\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        768,
+        1120
+      ],
+      "id": "c42dcd3b-afa1-4d93-96fd-2a181eec3c23",
+      "name": "HTTP Request10"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://n8n-general.interactivo.com.co/webhook/envio-whatsapp-todo-claro",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n\"variable\":  {{ $('Variables del menú').item.json.toJsonString() }},\n  \"tipo_mensaje\": \"texto\",\n  \"mensaje\": \"Tu solicitud ha sido registrada correctamente.\\n\\nPróximamente, uno de nuestros asesores se pondrá en contacto contigo para continuar con el proceso y proporcionarte la información solicitada.\\n\\nGracias por comunicarte con nosotros. 🔵🤝\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        960,
+        176
+      ],
+      "id": "e30b7ab3-dd33-480d-8889-b1d2a29887f7",
+      "name": "HTTP Request11"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://n8n-general.interactivo.com.co/webhook/envio-whatsapp-todo-claro",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n\"variable\":  {{ $('Variables del menú').item.json.toJsonString() }},\n  \"tipo_mensaje\": \"texto\",\n  \"mensaje\": \"Por favor ingrese numero de celular para realizar la llamada\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1184,
+        352
+      ],
+      "id": "0aae9c43-4038-4527-9f00-c398be5f5300",
+      "name": "HTTP Request12"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "UPDATE estado_2031509\nSET\n  paso = '6',\n  fecha_modificacion = NOW(),\n  id_conversacion = '{{ $('Variables del menú').item.json.id_conversacion }}',\n  num_advertencia = 0,\n  num_errores = 0,\n  session_wpp = '{{ $('Variables del menú').item.json.session }}',\n  payload = JSON_OBJECT(\n    'from', '{{ $('Webhook entrada').item.json.body.remitente_id }}',\n    'session', '{{ $('Variables del menú').item.json.session }}'\n  ),\n  ori_fields = JSON_ARRAY_APPEND(\n    IFNULL(ori_fields, JSON_ARRAY()),\n    '$',\n    JSON_OBJECT(\n      'respuesta', '{{ ($('Webhook entrada').item.json.body.texto || '').trim() }}',\n      'paso', '4'\n    )\n  )\nWHERE cliente = '{{ $('Webhook entrada').item.json.body.remitente_id }}'\nAND tipo = '{{ $('Variables del menú').item.json.tipo }}'\nAND id_cuenta = '1'\nAND id_inbox = '{{ $('Variables del menú').item.json.inbox_id }}'\nAND id_conversacion = '{{ $('Variables del menú').item.json.id_conversacion }}';",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.4,
+      "position": [
+        1408,
+        352
+      ],
+      "id": "5da18098-4318-4c87-97e9-65bc58841db5",
+      "name": "Guardar estado habeas2",
+      "credentials": {
+        "mySql": {
+          "id": "A0zURK0V73szrxpK",
+          "name": "MySQL Bot local"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Variables del menú').item.json.url_chatwoot }}/api/v1/accounts/1/conversations/{{ $('Variables del menú').item.json.id_conversacion }}/messages",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "api_access_token",
+              "value": "={{ $('Variables del menú').item.json.api_chatwoot }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"content\": \"Por favor ingrese numero de celular para realizar la llamada\",\n  \"message_type\": \"outgoing\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        912,
+        352
+      ],
+      "id": "aa91f451-ba7e-436b-a6db-5598a61c8f81",
+      "name": "pedir celular"
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Webhook entrada').item.json.body.media.url.replace('https://botconnect.interactivo.com.co:8443', 'https://wpp-general.interactivo.com.co') }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-Api-Key",
+              "value": "64cc4b90db614c639f3ae476423d5689"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -2128,
+        -160
+      ],
+      "id": "4401951d-fa24-43db-93d1-da0dc7a61efe",
+      "name": "HTTP Request13"
+    }
+  ],
+  "pinData": {
+    "Webhook entrada": [
+      {
+        "json": {
+          "headers": {
+            "host": "n8n-general.interactivo.com.co",
+            "accept": "application/json,text/html,application/xhtml+xml,application/xml,text/*;q=0.9, image/*;q=0.8, */*;q=0.7",
+            "content-type": "application/json",
+            "user-agent": "axios/1.12.0",
+            "accept-encoding": "gzip, compress, deflate, br",
+            "x-forwarded-proto": "https",
+            "x-forwarded-port": "443",
+            "x-forwarded-for": "172.18.0.3",
+            "x-forwarded-host": "n8n-general.interactivo.com.co",
+            "x-forwarded-server": "n8n-general.interactivo.com.co",
+            "content-length": "164",
+            "connection": "Keep-Alive"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "remitente_id": "264973712412714@lid",
+            "remitente_tipo": "lid",
+            "numero_limpio": null,
+            "texto": "Holaaaaa",
+            "timestamp": 1791211346,
+            "tipo": "texto",
+            "media": {},
+            "location": {}
+          },
+          "webhookUrl": "https://2031510-n8n.interactivo.com.co/webhook/bot-whatsapp-todo-claro",
+          "executionMode": "production"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Convert to File": {
+      "main": [
+        []
+      ]
+    },
+    "Variables imagen": {
+      "main": [
+        [
+          {
+            "node": "Convert to File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Obtener estado imagen": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request13",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Obtener Base64 Imagen": {
+      "main": [
+        []
+      ]
+    },
+    "Validar opción (1-5)": {
+      "main": [
+        [
+          {
+            "node": "Enviar Mensaje Chatwoot Agente12",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Validacion error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Obtener conversacion ubic1": {
+      "main": [
+        [
+          {
+            "node": "Ubicacion a Chatwoot1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalizar ubicacion1": {
+      "main": [
+        [
+          {
+            "node": "Geocodificar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Formato ubicacion": {
+      "main": [
+        [
+          {
+            "node": "Obtener conversacion ubic1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Geocodificar": {
+      "main": [
+        [
+          {
+            "node": "Formato ubicacion",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enviar Mensaje Chatwoot Cliente2": {
+      "main": [
+        [
+          {
+            "node": "Validar opción (1-5)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If2": {
+      "main": [
+        [
+          {
+            "node": "Switch2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request9": {
+      "main": [
+        []
+      ]
+    },
+    "Enviar Mensaje Chatwoot Agente13": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Guardar estado menú principal": {
+      "main": [
+        [
+          {
+            "node": "obtener label",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request3": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Obtener conversaciones totales1": {
+      "main": [
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "obtener label": {
+      "main": [
+        [
+          {
+            "node": "Asignar a asesor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Asignar a asesor": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code1": {
+      "main": [
+        [
+          {
+            "node": "Asignar agente1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Agentes en linea": {
+      "main": [
+        [
+          {
+            "node": "Obtener conversaciones totales1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Agentes en linea",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "pedir celular",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Habeas Chatwoot",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Validacion error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request2": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait5": {
+      "main": [
+        [
+          {
+            "node": "Enviar Mensaje Chatwoot Cliente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Crear Conversación1": {
+      "main": [
+        [
+          {
+            "node": "Enviar Mensaje Chatwoot Cliente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Si Contacto Existe": {
+      "main": [
+        [
+          {
+            "node": "Crear Conversación",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Crea Contacto ChatWoot",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GET CONTACT": {
+      "main": [
+        [
+          {
+            "node": "Filtro Inbox 11",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Crear Conversación": {
+      "main": [
+        [
+          {
+            "node": "Wait5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Crea Contacto ChatWoot": {
+      "main": [
+        [
+          {
+            "node": "Crear Conversación1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enviar Mensaje Chatwoot Cliente1": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch2": {
+      "main": [
+        [
+          {
+            "node": "Normalizar ubicacion1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Variables globales",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [],
+        [
+          {
+            "node": "Obtener estado imagen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enviar Mensaje Chatwoot Cliente": {
+      "main": [
+        [
+          {
+            "node": "obtener label3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Asignar a asesor3": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "obtener label3": {
+      "main": [
+        [
+          {
+            "node": "Asignar a asesor3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Guardar estado menú principal2": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request8": {
+      "main": [
+        []
+      ]
+    },
+    "Enviar Mensaje Chatwoot Agente12": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request11",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Wait1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Habeas Chatwoot": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Habeas WhatsApp": {
+      "main": [
+        []
+      ]
+    },
+    "Registrar respuesta habeas": {
+      "main": [
+        [
+          {
+            "node": "¿Responde SI o NO?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "¿Responde SI o NO?": {
+      "main": [
+        [
+          {
+            "node": "¿Acepta habeas?",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Validacion error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "¿Acepta habeas?": {
+      "main": [
+        [
+          {
+            "node": "Enviar Mensaje Chatwoot Agente13",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Rechazo Chatwoot",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Rechazo Chatwoot": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request10",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Rechazo WhatsApp": {
+      "main": [
+        []
+      ]
+    },
+    "Enrutar por estado1": {
+      "main": [
+        [
+          {
+            "node": "GET CONTACT",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "GET CONTACT",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "GET CONTACT",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "GET CONTACT",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Enviar Mensaje Chatwoot Cliente1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Enviar Mensaje Chatwoot Cliente2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Registrar mensaje asesor",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Registrar respuesta habeas",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Enviar Mensaje Chatwoot Agente12",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Validacion error1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request7": {
+      "main": [
+        []
+      ]
+    },
+    "Enviar Mensaje Chatwoot Agente": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait1": {
+      "main": [
+        [
+          {
+            "node": "Enviar Mensaje Chatwoot Agente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Variables del menú": {
+      "main": [
+        [
+          {
+            "node": "Enrutar por estado1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filtro Inbox 11": {
+      "main": [
+        [
+          {
+            "node": "Si Contacto Existe",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Obtener estado del usuario": {
+      "main": [
+        [
+          {
+            "node": "Variables del menú",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Variables globales": {
+      "main": [
+        [
+          {
+            "node": "Log de interacción",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log de interacción": {
+      "main": [
+        [
+          {
+            "node": "Obtener estado del usuario",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook entrada": {
+      "main": [
+        [
+          {
+            "node": "If2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request4": {
+      "main": [
+        [
+          {
+            "node": "Guardar estado menú principal1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request5": {
+      "main": [
+        [
+          {
+            "node": "Guardar estado habeas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request6": {
+      "main": [
+        [
+          {
+            "node": "Guardar estado menú principal",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request10": {
+      "main": [
+        [
+          {
+            "node": "Guardar estado rechazo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request11": {
+      "main": [
+        [
+          {
+            "node": "Guardar estado menú principal2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "pedir celular": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request12",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request12": {
+      "main": [
+        [
+          {
+            "node": "Guardar estado habeas2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request13": {
+      "main": [
+        [
+          {
+            "node": "Enviar Imagen Chatwoot",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "7512f26b-1da9-462e-8b2f-fe81937e8f5b",
+  "meta": {
+    "instanceId": "96f167ef9fc598a0df86865850e52d60ab6a8266bd19871ea22602dcb4530e3d"
+  },
+  "id": "4YAMxNjiahp9fGkI",
+  "tags": []
+}
